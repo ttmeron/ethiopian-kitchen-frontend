@@ -1,0 +1,63 @@
+<div class="order-container">
+    <h2>Current Orders</h2>
+    <div class="orders-grid">
+    <div *ngFor="let order of orders" class="order-card" [ngClass]="getTimerColor(order)">
+      <!-- Order Header -->
+      <div class="order-header">
+        <div class="order-meta">
+          <h3>Order #{{order.orderId}}</h3>
+          <span class="customer">{{order.userName}} ({{order.email}})</span>
+        </div>
+        <div class="order-timer" [ngClass]="getTimerColor(order)">
+          <span *ngIf="order.timerStatus === TimerStatus.READY">READY!</span>
+          <span *ngIf="order.timerStatus !== TimerStatus.READY">
+            {{order.remainingTime}} min
+          </span>
+        </div>
+      </div>
+  
+      <!-- Order Items -->
+      <div class="order-items">
+        <div *ngFor="let item of order.orderItems" class="order-item">
+          <div class="item-name">
+            {{item.quantity}} × {{item.foodName}}
+            <span class="item-price">{{item.price | currency}}</span>
+          </div>
+          
+          <!-- Custom Ingredients -->
+          <div *ngIf="item.customIngredients?.length" class="custom-items">
+            <div *ngFor="let ing of item.customIngredients" class="custom-item">
+              + {{ing.name || 'Custom'}} ({{ing.extraCost | currency}})
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Order Footer -->
+      <div class="order-footer">
+        <div class="order-total">
+          Total: {{order.totalPrice | currency}}
+        </div>
+        
+        <!-- <button *ngIf="order.timerStatus === TimerStatus.READY && order.status !== OrderStatus.READY"
+                (click)="markAsReady(order)" 
+                class="ready-button">
+          Mark as Ready
+        </button> -->
+        <button *ngIf="order.remainingTime != null && order.remainingTime < 5 && order.status !== OrderStatus.READY"
+        (click)="markAsReady(order)" 
+        class="ready-button">
+  Mark as Ready
+</button>
+
+
+
+
+      </div>
+    </div>
+   </div>
+  
+    <div *ngIf="orders.length === 0" class="no-orders">
+      No orders to display
+    </div>
+  </div>

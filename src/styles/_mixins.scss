@@ -1,0 +1,25 @@
+@use 'sass:color';
+@use 'variables' as v;
+
+@mixin card-style {
+  background: white;
+  border-radius: 8px;
+  box-shadow: v.$shadow;
+  overflow: hidden;
+  transition: v.$transition;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+@mixin hover-effect($base-color) {
+  &:hover {
+    background: color.adjust($base-color, $lightness: -15%);
+  }}
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

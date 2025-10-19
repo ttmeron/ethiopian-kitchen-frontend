@@ -1,0 +1,264 @@
+<div class="admin-container">
+  <h1>Food & Ingredient Management</h1>
+
+  <mat-tab-group class="full-width-tabs">
+
+    <!-- Foods Tab -->
+    <mat-tab label="Foods">
+      <div class="tab-content full-width-content">
+        <h2>Food Management</h2>
+
+        <form [formGroup]="foodForm" (ngSubmit)="submitFood()" class="food-form full-width-form">
+          <!-- Name Field -->
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" required>
+            <mat-error *ngIf="foodForm.get('name')?.hasError('required')">
+              Name is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Description Field -->
+          <mat-form-field appearance="outline" class="full-width-field">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="3" required></textarea>
+            <mat-error *ngIf="foodForm.get('description')?.hasError('required')">
+              Description is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Price and Category Row -->
+          <div class="form-row full-width-row">
+            <mat-form-field appearance="outline" class="form-field half-width">
+              <mat-label>Price</mat-label>
+              <input matInput type="number" formControlName="price" min="0" step="0.01" required>
+              <span matPrefix>$&nbsp;</span>
+              <mat-error *ngIf="foodForm.get('price')?.hasError('required')">
+                Price is required
+              </mat-error>
+              <mat-error *ngIf="foodForm.get('price')?.hasError('min')">
+                Price must be greater than 0
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field half-width">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category" required>
+                <mat-option *ngFor="let category of foodCategories" [value]="category">
+                  {{ category }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="foodForm.get('category')?.hasError('required')">
+                Category is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- FILE UPLOAD SECTION -->
+          <div class="file-upload-section full-width-section">
+            <h4>Food Image</h4>
+            <div class="file-input-wrapper full-width-wrapper">
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="file-input full-width-input" #fileInput>
+              <div class="file-hint">Supported formats: JPG, PNG, GIF, WEBP (Max 5MB)</div>
+            </div>
+
+            <div *ngIf="imagePreview" class="image-preview">
+              <p><strong>Image Preview:</strong></p>
+              <img [src]="imagePreview" alt="Preview" class="preview-image">
+              <button mat-icon-button color="warn" class="remove-image-btn" matTooltip="Remove image" (click)="removeSelectedImage()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+            <div *ngIf="isEditingFood && selectedFood && selectedFood.imagePath && !imagePreview" class="current-image">
+              <p><strong>Current Image:</strong></p>
+              <img [src]="getImageUrl(selectedFood)" alt="Preview" class="food-image-preview">
+            </div>
+
+            <div *ngIf="!selectedFile && !imagePreview && (!isEditingFood || !selectedFood || !selectedFood.imagePath)" class="no-image-message">
+              No image selected
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions full-width-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="foodForm.invalid">
+              <mat-icon *ngIf="!isEditingFood">add</mat-icon>
+              <mat-icon *ngIf="isEditingFood">save</mat-icon>
+              {{ isEditingFood ? 'Update Food' : 'Add Food' }}
+            </button>
+
+            <button *ngIf="isEditingFood" mat-button type="button" (click)="resetFoodForm()" class="cancel-btn" color="basic">
+              <mat-icon>cancel</mat-icon> Cancel
+            </button>
+
+            <button *ngIf="!isEditingFood" mat-button type="button" (click)="resetFoodForm()" class="colored-button" color="warn">
+              <mat-icon>clear</mat-icon> Clear Form
+            </button>
+          </div>
+        </form>
+
+        <!-- Food List Section -->
+        <div class="food-list-section full-width-section">
+          <h3>Food Items ({{ foods.length }})</h3>
+          <div *ngFor="let food of foods" class="food-item full-width-item">
+            <div class="food-content">
+              <div class="food-image-container">
+                <div *ngIf="food.imagePath" class="food-image-wrapper">
+                  <img [src]="getImageUrl(food)" [alt]="food.name" class="food-image">
+                </div>
+                <div *ngIf="!food.imagePath" class="no-image-placeholder">
+                  <mat-icon>fastfood</mat-icon>
+                  <span class="placeholder-text">No Image</span>
+                </div>
+              </div>
+
+              <div class="food-details full-width-details">
+                <div class="food-header">
+                  <div class="food-info full-width-info">
+                    <h4 class="food-name">{{ food.name }}</h4>
+                    <p class="food-description">{{ food.description }}</p>
+                    <div class="food-meta full-width-meta">
+                      <span class="meta-item"><strong>Price:</strong> ${{ food.price }}</span>
+                      <span class="meta-item"><strong>Category:</strong> {{ food.category }}</span>
+                      <span class="meta-item"><strong>Ingredients:</strong> {{ (food.ingredients.length) || 0 }}</span>
+                    </div>
+                  </div>
+
+                  <div class="food-actions">
+                    <button mat-icon-button color="primary" (click)="editFood(food)" matTooltip="Edit Food">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteFood(food)" matTooltip="Delete Food">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="foods.length === 0" class="empty-state full-width-empty">
+            <mat-icon class="empty-icon">restaurant</mat-icon>
+            <h3>No Food Items Yet</h3>
+            <p>Create your first food item to get started!</p>
+            <button mat-raised-button color="primary" (click)="addFood()"><mat-icon>add</mat-icon> Create First Food</button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Ingredients Tab -->
+    <!-- Ingredients Tab -->
+<mat-tab label="Ingredients">
+  <div class="tab-content full-width-content">
+    <h2>Manage Ingredients</h2>
+
+    <!-- Ingredient Selection -->
+    <div class="ingredient-selection-section">
+      <h3>Add Ingredients to Food</h3>
+      
+      <div class="ingredient-list">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Ingredients</mat-label>
+          <mat-select 
+            multiple 
+            (selectionChange)="onIngredientsSelected($event.value)"
+            panelClass="ingredient-select-panel">
+            <mat-option *ngFor="let ing of availableIngredients" [value]="ing.id">
+              {{ ing.name }} (Extra: {{ ing.extraCost | currency }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Selected Ingredients Display -->
+      <div class="selected-ingredients-section" *ngIf="selectedIngredients.length > 0">
+        <h4>Selected Ingredients ({{ selectedIngredients.length }})</h4>
+        
+        <div class="selected-ingredients-list">
+          <div *ngFor="let ingredient of selectedIngredients; let i = index" 
+               class="selected-ingredient-item">
+            
+            <div class="ingredient-info">
+              <span class="ingredient-name">{{ getIngredientName(ingredient.id) }}</span>
+              <span class="ingredient-price">+{{ getIngredientPrice(ingredient.id) | currency }}</span>
+            </div>
+
+            <div class="ingredient-controls">
+              <mat-form-field appearance="outline" class="small-field">
+                <mat-label>Extra Cost</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="ingredient.extraCost" 
+                       [ngModelOptions]="{standalone: true}"
+                       min="0" 
+                       step="0.01"
+                       (change)="updateIngredientCost(i, ingredient.extraCost)">
+                <span matPrefix>$&nbsp;</span>
+              </mat-form-field>
+
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="removeIngredient(i)"
+                      matTooltip="Remove ingredient">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Ingredients Selected Message -->
+      <div *ngIf="selectedIngredients.length === 0" class="no-ingredients-message">
+        <mat-icon>fastfood</mat-icon>
+        <p>No ingredients selected. Choose ingredients from the dropdown above.</p>
+      </div>
+    </div>
+
+    <!-- Available Ingredients List -->
+    <div class="available-ingredients-section">
+      <h3>Available Ingredients ({{ availableIngredients.length }})</h3>
+      
+      <div class="ingredients-grid">
+        <div *ngFor="let ingredient of availableIngredients" 
+             class="ingredient-card"
+             [class.selected]="isIngredientSelected(ingredient.id)">
+          
+          <div class="ingredient-card-content">
+            <div class="ingredient-header">
+              <h4>{{ ingredient.name }}</h4>
+              <span class="ingredient-cost">+{{ ingredient.extraCost | currency }}</span>
+            </div>
+            
+            <div class="ingredient-actions">
+              <button mat-raised-button 
+                      color="primary" 
+                      *ngIf="!isIngredientSelected(ingredient.id)"
+                      (click)="addIngredient(ingredient)">
+                <mat-icon>add</mat-icon>
+                Add
+              </button>
+              
+              <button mat-button 
+                      color="warn" 
+                      *ngIf="isIngredientSelected(ingredient.id)"
+                      (click)="removeIngredientById(ingredient.id)">
+                <mat-icon>remove</mat-icon>
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="availableIngredients.length === 0" class="empty-ingredients">
+        <mat-icon>inventory_2</mat-icon>
+        <p>No ingredients available. Add some ingredients first.</p>
+      </div>
+    </div>
+  </div>
+</mat-tab>
+
+  </mat-tab-group>
+</div>

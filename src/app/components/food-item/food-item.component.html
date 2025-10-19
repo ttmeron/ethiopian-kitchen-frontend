@@ -1,0 +1,17 @@
+<div class="food-card"(click)="onCardClick()">
+  <img
+    [src]="getImageUrl()"
+    alt="{{ food.name }}"
+    class="food-image"
+    (error)="handleImageError($event)"
+  />
+  
+  <div class="food-details">
+    <h2 class="food-name">{{ food.name }}</h2>
+    
+    <p class="description">{{ food.description }}</p>
+    
+    <div class="price">${{ food.price.toFixed(2) }}</div>
+    
+  </div>
+</div>

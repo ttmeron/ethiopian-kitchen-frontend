@@ -1,0 +1,94 @@
+<div class="checkout-container">
+  <mat-icon class="cancel-icon" (click)="closeCheckout()">close</mat-icon>
+  
+  <div class="checkout-header">
+    <h2>Checkout Options</h2>
+    
+    <p *ngIf="!loginMode && !guestMode">
+      You are not logged in. Choose an option to continue:
+    </p>
+    
+    <p *ngIf="loginMode">
+      To log in, please use the email you used when creating your account.
+    </p>
+    
+    <p *ngIf="guestMode">
+      You can create an account later after placing your order.
+    </p>
+  </div>
+
+  <!-- Guest/Login/Register Buttons -->
+  <div *ngIf="!guestMode && !loginMode" class="button-group">
+    <button mat-raised-button color="primary" (click)="continueAsGuest()">Continue as Guest</button>
+    <button mat-raised-button color="accent" (click)="showLoginForm()">Login</button>
+    <button mat-raised-button color="warn" (click)="goToRegister()">Register</button>
+  </div>
+
+  <!-- Guest Form -->
+  <div *ngIf="guestMode" class="guest-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput [(ngModel)]="userName" required>
+    </mat-form-field>
+  
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="email" type="email" required>
+    </mat-form-field>
+  
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+  
+    <div class="form-actions">
+      <button mat-raised-button 
+              color="primary" 
+              (click)="confirmGuest()"
+              [disabled]="isLoading">
+        {{ isLoading ? 'Processing...' : 'Confirm' }}
+      </button>
+      <button mat-stroked-button (click)="cancelgust()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div *ngIf="loginMode" class="login-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="loginEmail" type="email" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput 
+             [(ngModel)]="loginPassword" 
+             [type]="hidePassword ? 'password' : 'text'" 
+             required>
+      
+      <!-- Password visibility toggle button -->
+      <button mat-icon-button 
+              matSuffix 
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <button mat-raised-button 
+            color="primary" 
+            (click)="submitLogin()"
+            [disabled]="isLoading">
+      {{ isLoading ? 'Logging in...' : 'Login' }}
+    </button>
+
+    <div class="links">
+      <a (click)="navigateToRegister()">Create account</a>
+      <a (click)="forgotPassword()">Forgot password?</a>
+    </div>
+  </div>
+</div>

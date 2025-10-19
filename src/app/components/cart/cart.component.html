@@ -1,0 +1,105 @@
+<!-- cart.component.html -->
+<div class="cart-container">
+  <div class="cart-header">
+  
+</div>
+<h2 class="h2">Your Cart</h2>
+<div class="cart-items">
+ <div mat-list *ngIf="(cartItems$ | async)?.length; else emptyCart" class="cart-item">
+    <mat-list-item *ngFor="let item of cartItems$ | async">
+      <!-- Your existing cart item display -->
+     
+        <div class="item-row">
+          <div class="item-name-quantity">
+            <span>{{item.food.name}}</span>
+              <!-- <span class="quantity">{{item.quantity}}</span> -->
+          </div>
+          <div class="quantity-controls">
+            <button class="btd" (click)="decreaseQuantity(item)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <button class="bti" (click)="increaseQuantity(item)">
+              <mat-icon >add</mat-icon>
+            </button>
+            
+            <button mat-icon-button (click)="removeItem(item)">
+              <mat-icon class="custom-red-icon">delete</mat-icon>
+            </button>
+          </div>
+          <!-- <div class="price">${{ item.food.price.toFixed(2) }}</div> -->
+        <span>{{getBasePriceTotal(item) | currency}}</span>
+      </div>
+
+        <div *ngIf="item.ingredients?.length" class="ingredients-list">
+           <h4 class="add-ons-label" >Add-ons:</h4>
+           
+           <div *ngFor="let ingredient of item.ingredients" class="ingredient-row">
+
+            <span class="ingredient-name">{{ingredient.name}} </span>
+            
+
+            <span class="ingredient-price"> (+{{ingredient.extraCost | currency}})</span>
+          </div>
+        </div>
+      
+    </mat-list-item>
+    
+
+
+    <mat-divider></mat-divider>
+
+    <div class="delivery-options">
+      <h3>Delivery Method</h3>
+      <mat-radio-group [(ngModel)]="selectedDeliveryOption" 
+                        (change)="toggleDeliveryOption(selectedDeliveryOption)">
+
+        <mat-radio-button value="pickup" checked>
+          Pickup (Free)
+        </mat-radio-button>
+
+        <mat-radio-button value="delivery">
+          Delivery (${{cartService.getDeliveryFee() | number:'1.2-2'}})
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+    <div class="price-summary">
+    <div class="total-row">
+      <strong>Subtotal:</strong>
+      <strong>{{getCartTotal() | currency}}</strong>
+    </div>
+    <div class="price-row" *ngIf="selectedDeliveryOption === 'delivery'">
+      <span>Delivery Fee:</span>
+      <span>{{cartService.getDeliveryFee() | currency}}</span>
+    </div>
+
+    <div class="price-row">
+      <span>Tax ({{cartService.TAX_RATE * 100}}%):</span>
+      <span>{{getTax() | currency}}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="total-row">
+      <strong>Total:</strong>
+      <strong>{{getTotalWithTax() | currency}}</strong>
+    </div>
+ </div>
+</div>
+
+  <ng-template #emptyCart>
+    <p>Your cart is empty</p>
+  </ng-template>
+
+  <div class="dialog-actions">
+    <button mat-button class="continue-btn" (click)="closeDialog()">
+      CONTINUE SHOPPING
+    </button>
+    <button mat-raised-button class="checkout-btn" 
+            *ngIf="(cartItems$ | async)?.length"
+            (click)="checkout()">
+      CHECKOUT
+    </button>
+  </div>
+

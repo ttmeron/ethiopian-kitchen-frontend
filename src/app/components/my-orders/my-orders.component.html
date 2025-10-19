@@ -1,0 +1,99 @@
+<!-- my-orders.component.html -->
+<h2>Your Orders</h2>
+
+<div *ngIf="!authService.isLoggedIn()">
+  <label for="guestEmail">Enter your email to view your orders:</label>
+  <input id="guestEmail" [(ngModel)]="guestEmail" placeholder="Your email" />
+  <button (click)="loadMyOrders(guestEmail)">Load Orders</button>
+</div>
+
+<div *ngIf="authService.isLoggedIn()">
+  <p *ngIf="authService.getUser()">Welcome, {{ authService.getUser()?.userName }}! Here are your orders:</p>
+</div>
+
+<div *ngIf="myOrders.length === 0">You have no orders yet.</div>
+
+<div *ngFor="let order of myOrders" class="order-card">
+  <div class="order-header">
+    <p><strong>Order #:</strong> {{ order.orderNumber || order.orderId }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Total:</strong> {{ order.totalPrice | currency }}</p>
+    <p><strong>Placed:</strong> {{ order.placedTime | date:'short' }}</p>
+    <p><strong>Customer:</strong> {{ order.userName }} ({{ order.email }})</p>
+  </div>
+
+ <!-- Order Items Details -->
+<!-- Order Items Details -->
+<div class="order-items" *ngIf="order.orderItems && order.orderItems.length > 0">
+  <h4>Order Details:</h4>
+  <div *ngFor="let item of order.orderItems; let i = index" class="order-item">
+    
+    <!-- Item Header with name, quantity, and price -->
+    <div class="item-header">
+      <div class="item-name-quantity">
+        <span class="item-name">{{ item.foodName }}:</span>
+        <span class="item-quantity">x{{ item.quantity }}</span>
+      </div>
+      <!-- <div class="item-price">{{ item.price | currency }}</div> -->
+    </div>
+    
+    <!-- Custom Ingredients -->
+    <div *ngIf="item.customIngredients && item.customIngredients.length > 0" class="custom-ingredients">
+      <strong>Add Ons:</strong>
+      <div *ngFor="let ingredient of item.customIngredients" class="ingredient">
+        + {{ ingredient.ingredientName }} 
+        <span *ngIf="ingredient.quantity > 1">(x{{ ingredient.quantity }})</span>
+        <span *ngIf="ingredient.extraCost > 0"> - {{ ingredient.extraCost | currency }}</span>
+      </div>
+    </div>
+
+    <!-- Special Instructions -->
+    <div *ngIf="item.specialInstructions" class="special-instructions">
+      <strong>Special Instructions:</strong> {{ item.specialInstructions }}
+    </div>
+
+    <!-- No customizations message -->
+    <div *ngIf="(!item.customIngredients || item.customIngredients.length === 0)" 
+         class="no-customizations">
+      No customizations
+    </div>
+  </div>
+</div>
+  
+
+  <!-- Delivery Information -->
+  <div *ngIf="order.deliveryDTO" class="delivery-info">
+    <p><strong>Delivery Status:</strong> {{ order.deliveryDTO.status }}</p>
+    <p *ngIf="order.deliveryDTO.address"><strong>Delivery Address:</strong> {{ order.deliveryDTO.address }}</p>
+  </div>
+
+  <!-- Order Timing Information -->
+  <div *ngIf="order.estimatedReadyTime || order.remainingTime" class="timing-info">
+    <p *ngIf="order.estimatedReadyTime">
+      <strong>Estimated Ready:</strong> {{ order.estimatedReadyTime | date:'short' }}
+    </p>
+    <p *ngIf="order.remainingTime !== undefined">
+      <strong>Time Remaining:</strong> {{ order.remainingTime }} minutes
+    </p>
+    <p *ngIf="order.timerStatus">
+      <strong>Status:</strong> 
+      <span [class]="'timer-status-' + order.timerStatus">
+        {{ order.timerStatus }}
+      </span>
+    </p>
+  </div>
+</div>
+
+<div *ngIf="trackedOrder">
+  <p><strong>Order #:</strong> {{ trackedOrder.orderNumber || trackedOrder.orderId }}</p>
+  <p><strong>Status:</strong> {{ trackedOrder.status }}</p>
+  <p><strong>Total:</strong> {{ trackedOrder.totalPrice | currency }}</p>
+</div>
+
+<!-- Debug Section (optional) -->
+<!-- <div *ngIf="myOrders.length > 0" class="debug-section">
+  <button (click)="showDebug = !showDebug" class="debug-btn">
+    {{ showDebug ? 'Hide' : 'Show' }} Data Structure
+  </button>
+  <pre *ngIf="showDebug">{{ myOrders[0] | json }}</pre>
+</div> -->

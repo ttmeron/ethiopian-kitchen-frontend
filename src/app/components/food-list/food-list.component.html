@@ -1,0 +1,32 @@
+<div class="menu-container">
+  <h1 class="restaurant-name">ETHIOPIAN KITCHEN</h1>
+  
+  <div class="category-filter">
+    <button 
+      *ngFor="let category of categories"
+      [class.active]="category === selectedCategory"
+      (click)="filterByCategory(category)"
+      class="category-btn"
+    >
+      {{ category }}
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading menu...</div>
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+    <button (click)="retryLoading()">Retry</button>
+  </div>
+
+  <div class="menu-items" *ngIf="!isLoading && !errorMessage">
+    <app-food-item 
+      *ngFor="let food of filteredFoods"
+      [food]="food"
+    ></app-food-item>
+    
+    <div *ngIf="filteredFoods.length === 0" class="no-items">
+      No items available in this category.
+    </div>
+  </div>
+</div>

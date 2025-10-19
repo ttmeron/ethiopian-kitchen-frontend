@@ -1,0 +1,143 @@
+<div class="register-container">
+  <h2>Create Account</h2>
+  
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    
+    <!-- Username Field -->
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Username</mat-label>
+        <input 
+          matInput 
+          formControlName="userName" 
+          placeholder="Enter your username"
+          (blur)="onFieldBlur('userName')">
+        
+        <mat-error *ngIf="shouldShowError('userName')">
+          {{ getFieldErrors('userName') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Email Field -->
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input 
+          matInput 
+          formControlName="email" 
+          type="email"
+          placeholder="Enter your email"
+          (blur)="onFieldBlur('email')">
+        
+        <div class="email-check" *ngIf="isCheckingEmail">
+          <mat-spinner diameter="16"></mat-spinner>
+          <span>Checking email...</span>
+        </div>
+        
+        <mat-error *ngIf="shouldShowError('email')">
+          {{ getFieldErrors('email') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Password Field -->
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input 
+          matInput 
+          formControlName="password" 
+          [type]="hidePassword ? 'password' : 'text'"
+          placeholder="Enter your password"
+          (focus)="showPasswordRequirements = true"
+          (blur)="onPasswordBlur()">
+        
+        <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        
+        <mat-error *ngIf="shouldShowError('password')">
+          {{ getPasswordErrors() }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Requirements - Show when focused OR when password has value but isn't valid yet -->
+      <div class="password-requirements" *ngIf="(showPasswordRequirements || (password?.value && !isPasswordValid)) && password?.value">
+        <h4>Password Requirements:</h4>
+        <div [class.requirement-met]="getPasswordRequirements().hasMinLength">
+          {{ getPasswordRequirements().hasMinLength ? '✓' : '•' }} At least 6 characters
+        </div>
+        <div [class.requirement-met]="getPasswordRequirements().hasUpperCase">
+          {{ getPasswordRequirements().hasUpperCase ? '✓' : '•' }} Uppercase letter
+        </div>
+        <div [class.requirement-met]="getPasswordRequirements().hasLowerCase">
+          {{ getPasswordRequirements().hasLowerCase ? '✓' : '•' }} Lowercase letter
+        </div>
+        <div [class.requirement-met]="getPasswordRequirements().hasNumber">
+          {{ getPasswordRequirements().hasNumber ? '✓' : '•' }} Number
+        </div>
+        <div [class.requirement-met]="getPasswordRequirements().hasSpecialChar">
+          {{ getPasswordRequirements().hasSpecialChar ? '✓' : '•' }} Special character
+        </div>
+      </div>
+
+      <!-- Password Valid Indicator - Show when password is valid and requirements are not shown -->
+      <div class="password-valid" *ngIf="password?.value && isPasswordValid && !showPasswordRequirements">
+        ✓ Password meets all requirements
+      </div>
+    </div>
+
+    <!-- Confirm Password Field -->
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <input 
+          matInput 
+          formControlName="confirmPassword" 
+          [type]="hideConfirmPassword ? 'password' : 'text'"
+          placeholder="Confirm your password"
+          (focus)="showPasswordRequirements = false"
+          (blur)="onFieldBlur('confirmPassword')">
+        
+        <button mat-icon-button matSuffix (click)="toggleConfirmPasswordVisibility()" type="button">
+          <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        
+        <mat-error *ngIf="shouldShowError('confirmPassword')">
+          {{ getFieldErrors('confirmPassword') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password Match Indicator -->
+      <div class="password-match" *ngIf="confirmPassword?.value && passwordsMatch() && !shouldShowError('confirmPassword')">
+        ✓ Passwords match
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Submit Button -->
+    <button 
+      mat-raised-button 
+      color="primary" 
+      type="submit" 
+      class="submit-button"
+      [disabled]="isLoading">
+      
+      <span *ngIf="!isLoading">Create Account</span>
+      <span *ngIf="isLoading" class="loading">
+        <mat-spinner diameter="20"></mat-spinner>
+        Creating Account...
+      </span>
+    </button>
+
+    <!-- Login Link -->
+    <div class="login-link">
+      <p>Already have an account? <a routerLink="/login">Sign in</a></p>
+    </div>
+  </form>
+</div>

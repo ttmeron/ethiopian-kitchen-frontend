@@ -1,0 +1,75 @@
+<div class="food-modal">
+  <!-- Header with food image -->
+  <div class="food-header">
+    <img 
+    [src]="getImageUrl()" 
+    [alt]="data.food.name"
+    class="header-image"
+    (error)="handleImageError($event)"
+  />
+    <h1 class="food-title">{{data.food.name}}</h1>
+  </div>
+
+  <div class="food-content">
+    <p class="food-description">{{data.food.description}}</p>
+
+    <div class="price-section">
+      <span class="price-label">Base Price:</span>
+      <span class="price-value">${{data.food.price.toFixed(2)}}</span>
+    </div>
+
+    <div class="add-ons-section" *ngIf="ingredientsWithSelection.length">
+      <h3 class="section-title">Add Ons</h3>
+      <div *ngFor="let ingredient of ingredientsWithSelection" class="add-on-item">
+        <mat-checkbox [(ngModel)]="ingredient.selected" 
+                     (change)="updateTotalPrice()">
+          {{ingredient.name}} (+${{ingredient.extraCost.toFixed(2)}})
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="quantity-section">
+      <h3 class="section-title">Quantity</h3>
+      <div class="quantity-controls">
+        <button mat-icon-button (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+          <mat-icon>remove</mat-icon>
+        </button>
+        <span class="quantity">{{quantity}}</span>
+        <button mat-icon-button (click)="increaseQuantity()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="instructions-section">
+      <h3 class="section-title">Special Instructions</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput 
+                 [(ngModel)]="specialInstructions"
+                 placeholder="Any special requests?"
+                 rows="4"
+                 #specialInstructionsTextarea></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="total-section">
+      <span class="total-label">Total:</span>
+      <span class="total-value">${{totalPrice.toFixed(2)}}</span>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button mat-raised-button 
+        color="primary" 
+        (click)="addToOrder()"
+        [disabled]="isAddingToCart">
+  <div class="button-content">
+    <span *ngIf="!isAddingToCart">Add to Order - {{ totalPrice | currency }}</span>
+    <div *ngIf="isAddingToCart" class="loading-indicator">
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Adding...</span>
+    </div>
+  </div>
+</button>
+  </div>
+</div>

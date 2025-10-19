@@ -1,0 +1,90 @@
+.menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #333;
+}
+
+.restaurant-name {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #222;
+}
+
+.category-filter {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+
+  .category-btn {
+    padding: 8px 20px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+
+    &.active {
+      background: #078735;
+      color: white;
+    }
+  }
+}
+
+.menu-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center; // Center items, useful when less than 3
+}
+
+app-food-item {
+  flex: 0 0 calc(33.333% - 20px);
+  max-width: calc(33.333% - 20px);
+  transition: transform 0.3s ease, width 0.3s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
+
+  // ➤ Tablet fallback (2 per row)
+  @media (max-width: 1024px) {
+    flex: 0 0 calc(50% - 20px);
+    max-width: calc(50% - 20px);
+  }
+
+  // ➤ Mobile fallback (1 per row)
+  @media (max-width: 600px) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.loading,
+.error,
+.no-items {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 1.2rem;
+}
+
+.error button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

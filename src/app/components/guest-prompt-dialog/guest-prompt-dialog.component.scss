@@ -1,0 +1,273 @@
+.checkout-container {
+  position: relative;
+  max-width: 600px; /* Bigger width */
+  margin: 3rem auto;
+  text-align: center;
+  border-radius: 20px 20px 0 0;
+  height: 100%;
+  padding-bottom: 20px;
+  background-color: #f9f9f9;
+  // box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Optional: adds nice shadow */
+
+  .cancel-icon {
+    margin-top: -50px;
+    margin-right: 15px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1.8rem;
+    color: white;
+    cursor: pointer;
+
+    &:hover {
+      color: #e53935;
+    }
+  }
+
+  .checkout-header {
+    background-color: #078735;
+    height: 60px;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    margin-bottom: 35px; /* Reduced from 40px to 10px */
+    margin-top: -50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    h2 {
+      font-weight: 300;
+      font-size: 1.2rem;
+      color: white;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    p {
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      color: #aa0d05;
+      margin-top: 3rem;
+    }
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers buttons horizontally */
+    gap: 1rem;
+    margin-bottom: 3rem;
+    margin-top: 95px;
+    padding-top: 40px;
+    // box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);s
+
+    button {
+      width: 70%; /* Slightly smaller width for better centering */
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 15px;
+    }
+
+    /* Colors for each button */
+    .mat-primary {
+      background-color: #4e6b71 !important; /* Guest */
+      color: #fff !important;
+    }
+
+    .mat-accent {
+      background-color: #007bff !important; /* Login */
+      color: #fff !important;
+    }
+
+    .mat-warn {
+      background-color: #d9534f !important; /* Register */
+      color: #fff !important;
+    }
+  }
+
+  .guest-form {
+    margin: 1rem auto;
+    background-color: #f9f9f9;
+    border-radius: 25px;
+    margin-top: 80px;
+    margin-bottom: -20px;
+    height: 80%;
+    padding: 1rem;
+    width: 80%;
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      border-radius: 15px;
+
+      // background-color:  #078735 !important; 
+      .confirm {
+        background-color: #078735 !important; /* Green */
+        color: #fff !important;
+        border-radius: 15px;
+        width: 150px;
+      }
+
+      .cancel {
+        background-color: #d9534f !important; /* Red */
+        color: rebeccapurple !important;
+        border-radius: 15px;
+        width: 150px;
+      }
+    }
+  }
+
+  /* Remove any extra bottom border/line */
+  &:after {
+    content: none;
+  }
+
+  .error-message {
+    color: #d9534f;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .login-form {
+    margin: 1rem auto;
+    background-color: #f9f9f9;
+    border-radius: 25px;
+    margin-top: 80px;
+    margin-bottom: -20px;
+    height: 80%;
+    padding: 1rem;
+    width: 80%;
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+
+      /* Style for password field with visibility toggle */
+      &:has(.mat-icon-button[matSuffix]) {
+        .mat-form-field-suffix {
+          align-self: center;
+        }
+
+        .mat-icon-button {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .mat-icon {
+            font-size: 22px;
+            color: #666;
+            transition: color 0.2s ease;
+          }
+
+          &:hover {
+            .mat-icon {
+              color: #078735; /* Ethiopian green on hover */
+            }
+          }
+
+          &:active {
+            background-color: rgba(7, 135, 53, 0.1);
+          }
+        }
+      }
+    }
+
+    button[type="submit"] {
+      background-color: #078735; /* Ethiopian green */
+      color: white;
+      width: 85%;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+
+      &:hover {
+        background-color: #056b2b; /* Darker green */
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        background-color: #8fc19e; /* Muted green */
+        cursor: not-allowed;
+      }
+    }
+
+    .links {
+      margin-top: .5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+
+      a {
+        color: #b29c0c; /* Ethiopian yellow */
+        text-decoration: none;
+        font-weight: 500;
+        margin: 0 10px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: #e6c407; /* Darker yellow */
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .email {
+      border-radius: 15px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+
+      .confirm {
+        background-color: #078735 !important; /* Green */
+        color: #fff !important;
+        border-radius: 15px;
+        width: 150px;
+      }
+
+      .cancel {
+        background-color: #d9534f !important; /* Red */
+        color: #fff !important;
+        border-radius: 15px;
+        width: 150px;
+      }
+    }
+  }
+}
+
+/* Additional responsive styles */
+@media (max-width: 768px) {
+  .checkout-container {
+    margin: 1rem auto;
+    max-width: 95%;
+
+    .login-form {
+      width: 90%;
+      padding: 0.5rem;
+
+      mat-form-field {
+        &:has(.mat-icon-button[matSuffix]) {
+          .mat-icon-button {
+            width: 36px;
+            height: 36px;
+
+            .mat-icon {
+              font-size: 20px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

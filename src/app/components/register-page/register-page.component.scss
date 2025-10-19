@@ -1,0 +1,428 @@
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  margin-top: 77px;
+  background: linear-gradient(135deg, rgb(191, 191, 191) 0%, rgb(194, 240, 196) 100%);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    min-height: 100vh;
+  }
+
+  .email-available {
+    color: #ff2a13 !important;
+  }
+
+  .error-message {
+    color: #f44336 !important;
+    background-color: #ffebee;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #f44336;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);
+  }
+
+  mat-error {
+    color: #f44336 !important;
+    font-size: 0.8rem;
+  }
+
+  .email-available {
+    color: #ff1414 !important;
+  }
+
+  /* Material form field styling for error state */
+  mat-form-field.mat-form-field-invalid {
+    .mat-form-field-outline-thick {
+      color: #f44336 !important;
+    }
+
+    .mat-form-field-label {
+      color: #f44336 !important;
+    }
+  }
+
+  /* Material focused field with error */
+  mat-form-field.mat-form-field-invalid.mat-form-field-focused {
+    .mat-form-field-outline-thick {
+      color: #f44336 !important;
+    }
+  }
+
+  h2 {
+    color: rgb(6, 97, 18);
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 450px;
+    backdrop-filter: blur(10px);
+
+    @media (max-width: 768px) {
+      padding: 2rem 1.5rem;
+      margin: 0 1rem;
+    }
+
+    // FIX FOR HIDDEN FIRST CHARACTER
+    ::ng-deep {
+      .mat-form-field-appearance-outline .mat-form-field-infix {
+        padding: 1em 0 !important;
+      }
+      
+      .mat-form-field-appearance-outline .mat-input-element {
+        padding: 0 0.5em !important;
+        position: relative;
+        top: -2px;
+      }
+      
+      .mat-form-field-label-wrapper {
+        top: -1.5em;
+      }
+    }
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1.5rem;
+
+      // Custom styling for form fields
+      .mat-form-field-outline {
+        border-radius: 8px;
+      }
+
+      .mat-form-field-wrapper {
+        padding-bottom: 0;
+      }
+
+      .mat-form-field-outline-thick {
+        color: #3f51b5;
+      }
+
+      // Input text styling - NO CUSTOM PADDING
+      .mat-input-element {
+        font-size: 1rem;
+        color: #333;
+
+        &::placeholder {
+          color: #999;
+        }
+      }
+
+      // Label styling
+      .mat-form-field-label {
+        color: #666;
+        font-weight: 500;
+      }
+
+      // Floating label styling
+      .mat-form-field.mat-focused .mat-form-field-label {
+        color: #3f51b5;
+      }
+
+      // Error state styling
+      &.mat-form-field-invalid {
+        .mat-form-field-outline-thick {
+          color: #f44336;
+        }
+
+        .mat-form-field-label {
+          color: #f44336;
+        }
+      }
+
+      // Hint and error styling
+      .mat-hint {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.25rem;
+      }
+
+      .mat-error {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+
+        &::before {
+          content: "⚠";
+          margin-right: 0.5rem;
+          font-size: 0.9rem;
+        }
+      }
+
+      // Password visibility button styling
+      .mat-icon-button {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+
+        .mat-icon {
+          color: #666;
+          font-size: 1.2rem;
+          width: 20px;
+          height: 20px;
+
+          &:hover {
+            color: #3f51b5;
+          }
+        }
+      }
+    }
+
+    // Submit button styling
+    button[type="submit"] {
+      width: 100%;
+      height: 50px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 1.5rem 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        color: #666;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      .mat-spinner {
+        margin: 0 auto;
+        display: inline-block;
+
+        ::ng-deep circle {
+          stroke: white;
+        }
+      }
+    }
+  }
+
+  .error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #f44336;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);
+    animation: shake 0.5s ease-in-out;
+
+    &::before {
+      content: "❌";
+      margin-right: 0.5rem;
+    }
+  }
+
+  .login-link {
+    text-align: center;
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+
+    a {
+      color: #3f51b5;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -2px;
+        left: 0;
+        background-color: #3f51b5;
+        transition: width 0.3s ease;
+      }
+
+      &:hover {
+        color: #303f9f;
+
+        &::after {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// Animation for error message
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+// Custom scrollbar for the page
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// Loading state for form
+.form-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+// Success state animation
+@keyframes success-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+// Focus styles for accessibility
+mat-form-field {
+  .mat-input-element:focus-visible {
+    outline: 2px solid #97cfa4;
+    outline-offset: 2px;
+  }
+}
+
+// More vibrant green colors for password requirements
+.password-requirements {
+  margin-top: -35px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  div {
+    font-size: 12px;
+    margin-bottom: 6px;
+    padding: 4px 0;
+    transition: all 0.3s ease;
+    
+    // Default state (not met) - light gray
+    &:not(.requirement-met) {
+      color: #666;
+      background-color: transparent;
+    }
+    
+    // Met state - vibrant green with checkmark
+    &.requirement-met {
+      color: #2e7d32;
+      background-color: #e8f5e8;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Vibrant success indicators
+.password-valid {
+  margin-bottom: 10px;
+  margin-top: -30px;
+  padding: 10px 12px;
+  background-color: #4caf50;
+  border: 1px solid #388e3c;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .register-container {
+    background: #000;
+
+    h2 {
+      color: #fff;
+    }
+
+    form {
+      background: #fff;
+      border: 2px solid #000;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .error-message {
+    animation: none;
+  }
+}

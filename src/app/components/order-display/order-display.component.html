@@ -1,0 +1,27 @@
+<div class="order-display">
+    <h2>Current Orders</h2>
+    
+    <div class="orders-container">
+      <div *ngFor="let order of orders" class="order-card">
+        <div class="order-header">
+          <h3>Order #{{order.orderId}}</h3>
+          <span class="status">{{order.status}}</span>
+        </div>
+        
+        <div class="timer" [ngClass]="getTimerColor(order)">
+          {{order.remainingTime}} min
+        </div>
+        
+        <button 
+          *ngIf="order.status === OrderStatus.PROCESSING" 
+          (click)="markAsReady(order)"
+          class="ready-btn">
+          Mark as Ready
+        </button>
+      </div>
+    </div>
+  
+    <div *ngIf="orders.length === 0" class="no-orders">
+      No orders found
+    </div>
+  </div>

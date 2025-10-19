@@ -1,0 +1,703 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// ========== CRITICAL OVERLAY FIXES ==========
+::ng-deep .cdk-overlay-container {
+  z-index: 99999 !important; // Much higher z-index
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}
+
+::ng-deep .cdk-overlay-pane {
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+  
+  .mat-select-panel {
+    position: static !important;
+    z-index: 100001 !important;
+  }
+}
+
+::ng-deep .cdk-overlay-backdrop {
+  z-index: 99998 !important;
+}
+
+// ========== MAIN CONTAINER ==========
+.admin-container {
+  padding: 2rem;
+  background-color: #fafafa;
+  min-height: 100vh;
+  position: relative;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #222;
+    text-align: center;
+  }
+}
+
+// ========== MAT TAB GROUP - CRITICAL FIXES ==========
+.full-width-tabs {
+  width: 100%;
+  position: relative;
+
+  // Fix tab body overflow
+  ::ng-deep .mat-tab-body {
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  ::ng-deep .mat-tab-body-content {
+    overflow: visible !important;
+    position: relative !important;
+    transform: none !important;
+  }
+
+  ::ng-deep .mat-tab-body-wrapper {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  ::ng-deep .mat-tab-labels {
+    justify-content: center;
+    background-color: #f3f4f6;
+  }
+
+  ::ng-deep .mat-tab-label {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  ::ng-deep .mat-tab-label.mat-tab-label-active {
+    color: #1d4ed8;
+  }
+}
+
+.full-width-content {
+  margin-top: 2rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: visible !important; // Critical fix
+}
+
+// ========== FORM ==========
+.full-width-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: visible !important;
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+
+    .form-field {
+      flex: 1;
+      position: relative;
+    }
+  }
+
+  // Fix for mat-select in forms
+  ::ng-deep .mat-form-field {
+    position: relative !important;
+    
+    .mat-form-field-flex {
+      position: relative;
+      z-index: 5;
+    }
+    
+    .mat-form-field-infix {
+      position: relative;
+    }
+  }
+
+  // Remove conflicting mat-select-panel styles
+  .file-upload-section {
+    margin-top: 1rem;
+
+    h4 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #111827;
+    }
+
+    .file-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .file-hint {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .file-input {
+      padding: 0.5rem;
+      border: 1px dashed #d1d5db;
+      border-radius: 8px;
+      background-color: #f9fafb;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+
+      &:hover {
+        border-color: #2563eb;
+      }
+    }
+
+    .image-preview,
+    .current-image {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 1rem;
+
+      .preview-image,
+      .food-image-preview {
+        width: 200px;
+        height: 200px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+        background-color: #f9fafb;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      .remove-image-btn {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 50%;
+      }
+    }
+
+    .no-image-message {
+      margin-top: 0.5rem;
+      color: #9ca3af;
+      font-style: italic;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    .submit-btn {
+      font-weight: 600;
+    }
+
+    .cancel-btn,
+    .colored-button {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+  }
+}
+
+// ========== INGREDIENTS SECTION - COMPLETE REDESIGN ==========
+.ingredient-selection-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .ingredient-list {
+    margin-bottom: 1.5rem;
+
+    ::ng-deep .ingredient-select-panel {
+      z-index: 10000 !important;
+      
+      .mat-option {
+        border-bottom: 1px solid #f1f3f4;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+// Selected Ingredients
+.selected-ingredients-section {
+  margin-top: 1.5rem;
+
+  h4 {
+    color: #495057;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .selected-ingredients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .selected-ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-color: #007bff;
+    }
+
+    .ingredient-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .ingredient-name {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1rem;
+      }
+
+      .ingredient-price {
+        color: #28a745;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+    }
+
+    .ingredient-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .small-field {
+        width: 120px;
+
+        ::ng-deep .mat-form-field-wrapper {
+          padding-bottom: 0;
+        }
+
+        ::ng-deep .mat-form-field-infix {
+          width: 100px;
+        }
+      }
+    }
+  }
+}
+
+// No Ingredients Message
+.no-ingredients-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    color: #adb5bd;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+// Available Ingredients Grid
+.available-ingredients-section {
+  margin-top: 2rem;
+
+  h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .ingredient-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+
+    &.selected {
+      border-color: #007bff;
+      background: #f8f9fe;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .ingredient-card-content {
+      .ingredient-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+
+        h4 {
+          margin: 0;
+          color: #2c3e50;
+          font-weight: 600;
+          font-size: 1.1rem;
+        }
+
+        .ingredient-cost {
+          color: #28a745;
+          font-weight: 600;
+          font-size: 1rem;
+        }
+      }
+
+      .ingredient-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .empty-ingredients {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+
+    mat-icon {
+      font-size: 4rem;
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: 1rem;
+      color: #adb5bd;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// ========== OVERLAY FIXES ==========
+::ng-deep .cdk-overlay-container {
+  z-index: 10000 !important;
+}
+
+::ng-deep .mat-select-panel {
+  z-index: 10001 !important;
+  position: relative !important;
+}
+
+// ========== RESPONSIVE DESIGN ==========
+@media (max-width: 768px) {
+  .ingredient-selection-section {
+    padding: 1rem;
+  }
+
+  .selected-ingredient-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+
+    .ingredient-controls {
+      justify-content: space-between;
+    }
+  }
+
+  .ingredients-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ingredient-card {
+    padding: 1rem;
+  }
+}
+
+// ========== FOOD LIST ==========
+.food-list-section {
+  margin-top: 3rem;
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .food-item {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.2s ease;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .food-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+
+    .food-image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 160px;
+      height: 160px;
+
+      .food-image-wrapper {
+        width: 100%;
+        height: 100%;
+
+        .food-image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 12px;
+          border: 2px solid #f3f4f6;
+        }
+      }
+
+      .no-image-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        background-color: #f9fafb;
+        color: #9ca3af;
+
+        .mat-icon {
+          font-size: 40px;
+          margin-bottom: 0.5rem;
+        }
+
+        .placeholder-text {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .food-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .food-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+
+        .food-info {
+          flex: 1;
+
+          .food-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+          }
+
+          .food-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .food-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+
+            .meta-item {
+              font-size: 0.9rem;
+              color: #374151;
+            }
+          }
+        }
+
+        .food-actions {
+          display: flex;
+          gap: 0.5rem;
+
+          .edit-btn:hover {
+            color: #2563eb;
+          }
+
+          .delete-btn:hover {
+            color: #dc2626;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #6b7280;
+    margin-top: 2rem;
+
+    .empty-icon {
+      font-size: 48px;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+
+    h3 {
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    .create-first-btn {
+      margin-top: 1rem;
+    }
+  }
+}
+
+// ========== INGREDIENT TAB PLACEHOLDER ==========
+.ingredients-placeholder {
+  text-align: center;
+  color: #6b7280;
+  padding: 3rem 1rem;
+
+  .placeholder-icon {
+    font-size: 60px;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+  }
+
+  .ingredients-stats {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #374151;
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 900px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .food-item {
+    .food-content {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .food-image-container {
+      width: 140px;
+      height: 140px;
+    }
+
+    .food-meta {
+      justify-content: center;
+    }
+
+    .food-actions {
+      justify-content: center;
+    }
+  }
+
+  // Mobile dropdown fixes
+  ::ng-deep .cdk-overlay-pane {
+    max-width: 100vw !important;
+    
+    .mat-select-panel {
+      max-width: calc(100vw - 40px) !important;
+    }
+  }
+}

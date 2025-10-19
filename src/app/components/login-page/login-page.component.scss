@@ -1,0 +1,162 @@
+.container{
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, rgb(191, 191, 191) 0%, rgb(194, 240, 196) 100%);
+  padding: 20px;
+  box-sizing: border-box;
+
+}
+.login-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  margin-top: 180px;
+
+  h2 {
+    color: #078735; /* Ethiopian green */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 1.8rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    mat-form-field {
+      width: 100%;
+
+      .mat-form-field-outline {
+        color: #d1d1d1;
+      }
+
+      .mat-form-field-outline-thick {
+        color: #078735; /* Ethiopian green */
+      }
+
+      .mat-input-element {
+        color: #333;
+      }
+
+      mat-label {
+        color: #666;
+      }
+
+      /* Style for password field with visibility toggle */
+      .mat-icon-button {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .mat-icon {
+          font-size: 22px;
+          color: #666;
+          transition: color 0.2s ease;
+        }
+
+        &:hover {
+          .mat-icon {
+            color: #078735; /* Ethiopian green on hover */
+          }
+        }
+
+        &:active {
+          background-color: rgba(7, 135, 53, 0.1);
+        }
+      }
+    }
+  }
+
+  button[type="submit"] {
+    background-color: #078735; /* Ethiopian green */
+    color: white;
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+
+    &:hover {
+      background-color: #056b2b; /* Darker green */
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      background-color: #8fc19e; /* Muted green */
+      cursor: not-allowed;
+    }
+  }
+
+  .links {
+    margin-top: 1.5rem;
+    text-align: center;
+
+    a {
+      color: #b29c0c; /* Ethiopian yellow */
+      text-decoration: none;
+      font-weight: 500;
+      margin: 0 10px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #e6c407; /* Darker yellow */
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .error-message {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+    margin: 1rem 0;
+    text-align: center;
+  }
+
+  /* Ethiopian flag inspired accents */
+  .flag-accent {
+    height: 4px;
+    background: linear-gradient(
+      to right,
+      #078735 33%,  /* Green */
+      #fcdd09 33% 66%,  /* Yellow */
+      #e74c3c 66%  /* Red */
+    );
+    margin: 1rem 0;
+    border-radius: 2px;
+  }
+  .admin-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  color: #1976d2;
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  span {
+    font-size: 14px;
+  }
+}
+}

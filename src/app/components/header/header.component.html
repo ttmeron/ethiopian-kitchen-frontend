@@ -1,0 +1,58 @@
+<nav class="navbar">
+  <!-- Hamburger -->
+  <button class="hamburger"  [ngClass]="{ 'active': isMenuOpen }"
+  (click)="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Brand -->
+  <div class="brand" routerLink="/">
+    <span class="amharic">የኢትዮጵያ ምግብ ቤት</span>
+    <span class="english">ETHIOPIAN KITCHEN</span>
+  </div>
+
+  <!-- Cart -->
+  <button class="cart-btn" (click)="openCart()">
+    <svg class="cart-icon" viewBox="0 0 24 24">
+      <path
+        d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 
+        7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 
+        0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 
+        1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 
+        0-.55-.45-1-1-1H5.21l-.94-2H1zm16 
+        16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 
+        2-.9 2-2-.9-2-2-2z"
+      />
+    </svg>
+    @if ((cartService.cart$ | async)?.length; as count) {
+      <span class="cart-badge">{{ count }}</span>
+    }
+  </button>
+
+</nav>
+
+<!-- ✅ Mobile menu -->
+<div class="mobile-menu" *ngIf="isMenuOpen">
+  <a routerLink="/menu" (click)="toggleMenu()">Menu</a>
+  <a routerLink="/my-orders" (click)="toggleMenu()">Orders</a>
+  <a routerLink="/contact" (click)="toggleMenu()">Contact</a>
+
+
+   <a *ngIf="isAdmin" routerLink="/admin/dashboard" (click)="toggleMenu()">
+    Admin Panel
+  </a>
+ 
+  <a class="logout-link" 
+   *ngIf="showLogoutLink"
+   (click)="handleLogout($event)">
+   Logout
+</a>
+<a class="login-link"
+     *ngIf="!showLogoutLink"
+     routerLink="/login"
+     (click)="toggleMenu()">
+     Login
+  </a>
+</div>
