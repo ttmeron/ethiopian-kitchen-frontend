@@ -1,4 +1,4 @@
-// services/admin-food.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable,throwError } from 'rxjs';
@@ -32,7 +32,6 @@ export class AdminFoodService {
 
   private handleError(error: HttpErrorResponse) {
     if (error.status === 401 || error.status === 403) {
-      // Unauthorized or Forbidden - user is not admin
       return throwError(() => new Error('You do not have permission to perform this action'));
     }
     
@@ -43,7 +42,6 @@ export class AdminFoodService {
     return throwError(() => new Error('An error occurred. Please try again.'));
   }
 
-  // Food Management with Multipart FormData
   createFood(foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
     
     if (!this.authService.isAdmin()) {
@@ -52,10 +50,8 @@ export class AdminFoodService {
     
     const formData = new FormData();
     
-    // Add the food request as JSON string
     formData.append('foodRequest', JSON.stringify(foodData));
     
-    // Add image file if provided
     if (imageFile) {
       formData.append('imageFile', imageFile, imageFile.name);
     }
@@ -65,26 +61,60 @@ export class AdminFoodService {
   }
 
   updateFood(id: number, foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
+  const formData = new FormData();
+  const token = this.authService.getToken();
+  
+  const foodJson = JSON.stringify(foodData);
+  console.log('📤 Food JSON:', foodJson);
+  
+  const foodBlob = new Blob([foodJson], { type: 'application/json' });
+  formData.append('foodRequest', foodBlob);  
 
-    if (!this.authService.isAdmin()) {
-      return throwError(() => new Error('Admin access required'));
-    }
-
-    const formData = new FormData();
-    
-    // Add the food request as JSON string
-    formData.append('foodRequest', JSON.stringify(foodData));
-    
-    // Add image file if provided
-    if (imageFile) {
-      formData.append('imageFile', imageFile, imageFile.name);
-    }
-
-    return this.http.put<FoodResponse>(`${this.apiUrl}/foods/admin/${id}`, formData)
-    .pipe(catchError(this.handleError));
+  if (imageFile) {
+    console.log('🖼️ Adding image:', imageFile.name);
+    formData.append('imageFile', imageFile);  
   }
+  
+  console.log('📦 FormData contents:');
+  for (let pair of (formData as any).entries()) {
+    console.log(`  ${pair[0]}:`, pair[1]);
+  }
+  
+  return this.http.put<FoodResponse>(
+    `${this.apiUrl}/foods/admin/${id}`,
+    formData,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  ).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('❌ Update error:', error);
+      console.log('Full error response:', error.error);
+      return throwError(() => error);
+    })
+  );
+}
 
-  // Other methods remain the same
+private printFormData(formData: FormData): void {
+  console.log('📦 FormData Contents:');
+  for (let pair of (formData as any).entries()) {
+    const key = pair[0];
+    const value = pair[1];
+    
+    if (key === 'foodRequest' && value instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.log(`  ${key}:`, reader.result);
+      };
+      reader.readAsText(value);
+    } else {
+      console.log(`  ${key}:`, value);
+    }
+  }
+}
+
   getFoods(): Observable<FoodResponse[]> {
     return this.http.get<FoodResponse[]>(`${this.apiUrl}/foods`);
   }

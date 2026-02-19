@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, tap, of, catchError } from 'rxjs';
@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 
 @Component({
@@ -50,12 +51,28 @@ export class RegisterPageComponent {
     confirmPassword: false
   };
 
+  private cameFromCheckout: boolean = false;
+  isDialogMode: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    @Optional() private dialogRef: MatDialogRef<RegisterPageComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {
-    // Initialize form with validations
+
+    this.isDialogMode = !!this.dialogRef;
+    if (this.dialogData?.fromCheckout) {
+    this.cameFromCheckout = true;
+     console.log('✅ cameFromCheckout set to TRUE from dialogData');
+  }
+  
+  const navigation = this.router.getCurrentNavigation();
+  if (navigation?.extras?.state?.['fromCheckout']) {
+    this.cameFromCheckout = true;
+  }
+
     this.registerForm = this.fb.group({
       userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -67,11 +84,10 @@ export class RegisterPageComponent {
       confirmPassword: ['', Validators.required]
     }, { validator: this.passwordMatchValidator });
 
-    // Email availability check
     this.emailCheck$.pipe(
       debounceTime(500),
       distinctUntilChanged(),
-      tap(() => this.isCheckingEmail = true), // Show loading state
+      tap(() => this.isCheckingEmail = true), 
       switchMap(email => {
         if (!email || this.email?.invalid) {
           this.emailExists = false;
@@ -103,7 +119,6 @@ export class RegisterPageComponent {
     });
   }
 
-  // Getter methods for easy access to form controls in template
   get userName() { return this.registerForm.get('userName'); }
   get email() { return this.registerForm.get('email'); }
   get password() { return this.registerForm.get('password'); }
@@ -114,15 +129,24 @@ export class RegisterPageComponent {
     return !!field && field.invalid && (this.blurredFields[fieldName as keyof typeof this.blurredFields] || field.touched);
   }
 
-  // Handle blur events for each field
   onFieldBlur(fieldName: keyof typeof this.blurredFields) {
     this.blurredFields[fieldName] = true;
     
-    // Special handling for email field
     if (fieldName === 'email') {
       this.checkEmail();
     }
   }
+
+  showBackToCheckout(): boolean {
+  return this.cameFromCheckout;
+}
+
+navigateToCheckoutOptions(): void {
+  if (this.dialogRef) {
+    this.dialogRef.close({ action: 'backToCheckout' });
+  } else {
+    this.router.navigate(['/menu']); 
+  }}
 
   getPasswordRequirements() {
     const value = this.password?.value || '';
@@ -135,7 +159,6 @@ export class RegisterPageComponent {
     };
   }
 
-  //  Check if all password requirements are met
   get isPasswordValid(): boolean {
     const req = this.getPasswordRequirements();
     return req.hasUpperCase && req.hasLowerCase && req.hasNumber && req.hasSpecialChar && req.hasMinLength;
@@ -146,11 +169,10 @@ export class RegisterPageComponent {
     const emailControl = this.registerForm.get('email');
     const email = emailControl?.value;
     
-    // Only check if email is valid and not empty
     if (email && emailControl?.valid) {
       this.emailCheck$.next(email);
     } else {
-      this.emailExists = false; // Reset if email is invalid or empty
+      this.emailExists = false; 
     }
   }
 
@@ -222,7 +244,6 @@ export class RegisterPageComponent {
   }
 
   onSubmit() {
-    // Mark all fields as touched to trigger error display
     this.markFormGroupTouched(this.registerForm);
     Object.keys(this.blurredFields).forEach(key => {
       this.blurredFields[key as keyof typeof this.blurredFields] = true;
@@ -231,7 +252,6 @@ export class RegisterPageComponent {
 
     this.showPasswordRequirements = false;
 
-    // Check for specific errors and set appropriate messages
     if (this.registerForm.invalid) {
       if (this.emailExists) {
         this.errorMessage = "Email already exists. Please use a different email.";
@@ -293,11 +313,9 @@ export class RegisterPageComponent {
   }
 
   
-  // Add this method to your component class
   onPasswordBlur() {
     this.blurredFields.password = true;
     
-    // Only hide requirements if password is valid
     if (this.isPasswordValid) {
       this.showPasswordRequirements = false;
     }
@@ -306,15 +324,12 @@ export class RegisterPageComponent {
   private getErrorMessage(err: any): string {
     console.log('Registration error:', err);
     
-    // First priority: if our real-time check found the email exists
     if (this.emailExists) {
       return 'This email is already registered. Please use a different email.';
     }
 
-    // Second: check the actual error response from the server
     const errorText = JSON.stringify(err).toLowerCase();
     
-    // Look for email-related errors in the entire error object
     if (errorText.includes('email') && 
         (errorText.includes('already') || 
          errorText.includes('exists') || 
@@ -323,7 +338,6 @@ export class RegisterPageComponent {
       return 'This email is already registered. Please use a different email.';
     }
 
-    // Try to extract specific error message
     if (err.error?.message) {
       return err.error.message;
     }

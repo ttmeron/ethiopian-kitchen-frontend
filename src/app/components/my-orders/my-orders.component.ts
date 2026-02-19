@@ -32,16 +32,25 @@ export class MyOrdersComponent implements OnInit{
     public authService: AuthService,
     private dialog: MatDialog){}
   
-  ngOnInit() {
-    this.loadMyOrders();
 
-    setTimeout(() => {
-      if (this.myOrders.length > 0 && this.myOrders[0].orderItems.length > 0) {
-        console.log('First order item structure:', this.myOrders[0].orderItems[0]);
-        console.log('Has addOns property?', 'addOns' in this.myOrders[0].orderItems[0]);
-      }
-    }, 1000);
-  }
+  ngOnInit() {
+  const guestEmail = sessionStorage.getItem('guestEmail');
+  
+  if (this.authService.isLoggedIn()) {
+    this.loadOrdersForCurrentUser();
+  } else if (guestEmail) {
+    console.log('📬 Loading orders for guest:', guestEmail);
+    this.guestEmail = guestEmail;
+    this.loadMyOrders(guestEmail);
+  } 
+
+  setTimeout(() => {
+    if (this.myOrders.length > 0 && this.myOrders[0].orderItems.length > 0) {
+      console.log('First order item structure:', this.myOrders[0].orderItems[0]);
+      console.log('Has addOns property?', 'addOns' in this.myOrders[0].orderItems[0]);
+    }
+  }, 1000);
+}
   
   trackOrder(): void {
     if (!this.trackingToken) return;
@@ -76,13 +85,11 @@ dialogRef.afterClosed().subscribe((result: GuestLoginResult) => {
     if (result.action === 'login_success') {
       this.loadOrdersForCurrentUser();
     } else if (result.action === 'register') {
-      // handle register action
+     
     }
   }
 });
 }
-
-  
   loadOrdersForCurrentUser() {
     this.orderService.getCurrentUserOrders().subscribe({
       next: (orders) => {
@@ -100,16 +107,13 @@ dialogRef.afterClosed().subscribe((result: GuestLoginResult) => {
       const currentUser = this.authService.getCurrentUser();
       
       if (currentUser) {
-        // Type-safe property access
         email = currentUser.email || '';
         
-        // Optional: Special handling for guest users
         if (this.authService.isGuestUser(currentUser)) {
           console.log('Loading orders for guest user:', currentUser.email);
           
         }
       } else {
-        // Fallback for legacy/unauthenticated access
         email = sessionStorage.getItem('guestEmail') || '';
       }
     }
@@ -131,12 +135,10 @@ dialogRef.afterClosed().subscribe((result: GuestLoginResult) => {
           console.log('=== First Order Analysis ===');
           console.log('Full order object:', JSON.stringify(firstOrder, null, 2));
           
-          // Check if placedTime exists and its value
           console.log('placedTime exists?', 'placedTime' in firstOrder);
           console.log('placedTime value:', firstOrder.placedTime);
           console.log('placedTime truthy?', !!firstOrder.placedTime);
           
-          // Check OrderTiming properties
           console.log('OrderTiming properties:');
           console.log('- placedTime:', firstOrder.placedTime);
           console.log('- estimatedReadyTime:', firstOrder.estimatedReadyTime);
@@ -147,8 +149,5 @@ dialogRef.afterClosed().subscribe((result: GuestLoginResult) => {
       error: (err) => console.error('Failed to load user orders:', err)
     });
   }
-
- 
-  
 
 }

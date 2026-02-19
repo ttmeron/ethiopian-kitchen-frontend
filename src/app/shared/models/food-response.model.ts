@@ -5,7 +5,7 @@ export interface FoodResponse {
   description?: string;
   imagePath?: string | null;
   ingredients: Ingredient[];
-  createdAt: string; // example: "2023-07-15T14:30:00"
+  createdAt: string; 
 
 
   available?: boolean; 
@@ -20,7 +20,7 @@ export interface ApiAddOn {
   id: number;
   name: string;
   price: number;
-  extraCost?: number; // Optional in API response
+  extraCost?: number; 
   category?: string;
 }
 
@@ -29,7 +29,7 @@ export interface Ingredient {
   name: string;
   price:number;
   extraCost: number;
-  selected?: boolean; // Add optional selected property
-  category?: string;      // For categorization (sauces, toppings, etc.)
+  selected?: boolean; 
+  category?: string;    
   isAvailable?: boolean; 
 }

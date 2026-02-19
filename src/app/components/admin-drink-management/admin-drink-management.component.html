@@ -1,0 +1,98 @@
+<mat-card>
+  <h2>{{ isEditing ? 'Edit Drink' : 'Add Drink' }}</h2>
+
+  <form [formGroup]="drinkForm" (ngSubmit)="submitDrink()">
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Drink Name" formControlName="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput placeholder="Description" formControlName="description"></textarea>
+    </mat-form-field>
+
+   
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" placeholder="Price" formControlName="price" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Size</mat-label>
+      <mat-select formControlName="size">
+        <mat-option *ngFor="let s of sizes" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Ice Option</mat-label>
+      <mat-select formControlName="iceOption">
+        <mat-option *ngFor="let i of iceOptions" [value]="i.value">
+          {{ i.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <input type="file" (change)="onFileSelected($event)" />
+    <img *ngIf="imagePreview" [src]="imagePreview" width="120" />
+
+    <button mat-raised-button color="primary" type="submit">
+      {{ isEditing ? 'Update' : 'Create' }}
+    </button>
+  </form>
+</mat-card>
+
+<mat-card>
+  <h2>Drinks</h2>
+
+  <table mat-table [dataSource]="drinks" class="full-width">
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let d">{{ d.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef>Price</th>
+      <td mat-cell *matCellDef="let d">${{ d.price }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="size">
+      <th mat-header-cell *matHeaderCellDef>Size</th>
+      <td mat-cell *matCellDef="let d">{{ d.size }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="iceOptions">
+      <th mat-header-cell *matHeaderCellDef>Options</th>
+      <td mat-cell *matCellDef="let d">
+        {{ d.iceOption }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="image">
+      <th mat-header-cell *matHeaderCellDef>Image</th>
+      <td mat-cell *matCellDef="let d">
+        <img [src]="getImageUrl(d)" width="50" />
+      </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let d">
+        <button mat-icon-button (click)="editDrink(d)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteDrink(d)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</mat-card>

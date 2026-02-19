@@ -9,8 +9,8 @@
 
   <!-- Brand -->
   <div class="brand" routerLink="/">
-    <span class="amharic">የኢትዮጵያ ምግብ ቤት</span>
-    <span class="english">ETHIOPIAN KITCHEN</span>
+    <span class="amharic">ጥሩ ኢትዮጵያ ምግብ ቤት</span>
+    <span class="english">TIRU ETHIOPIAN KITCHEN</span>
   </div>
 
   <!-- Cart -->
@@ -36,13 +36,41 @@
 <!-- ✅ Mobile menu -->
 <div class="mobile-menu" *ngIf="isMenuOpen">
   <a routerLink="/menu" (click)="toggleMenu()">Menu</a>
-  <a routerLink="/my-orders" (click)="toggleMenu()">Orders</a>
-  <a routerLink="/contact" (click)="toggleMenu()">Contact</a>
+  <a (click)="navigateToOrders()">Orders</a>
+  <a routerLink="/about" (click)="toggleMenu()">About & Contact</a>
+  
+  <div class="hours-section">
+    <div class="hours-toggle" (click)="toggleHoursMenu()">
+      <span>Business Hours</span>
+      <span class="arrow">{{ isHoursOpen ? '▲' : '▼' }}</span>
+    </div>
+    <div class="hours-submenu" *ngIf="isHoursOpen">
+      <div class="hours-item" *ngFor="let hour of businessHours">
+        <span class="day">{{ hour.day }}</span>
+        <span class="time">{{ hour.hours }}</span>
+      </div>
+    </div>
+  </div>
 
-
-   <a *ngIf="isAdmin" routerLink="/admin/dashboard" (click)="toggleMenu()">
-    Admin Panel
-  </a>
+<div class="admin-dropdown-mobile" *ngIf="isAdmin">
+    <a class="admin-toggle" (click)="toggleAdminMenu()">
+      Admin Panel ▼
+    </a>
+    <div class="admin-submenu" *ngIf="isAdminMenuOpen">
+      <a routerLink="/admin/food-management" (click)="toggleMenu(); toggleAdminMenu()">
+      Food Management
+      </a>
+      <a routerLink="/admin/ingredients" (click)="toggleMenu(); toggleAdminMenu()">
+      Ingredient Management
+    </a>
+      <a [routerLink]="['/admin/drinks']" (click)="toggleMenu(); toggleAdminMenu()">
+      Drink Management
+    </a>
+    <a [routerLink]="['/admin/employees']" (click)="toggleMenu(); toggleAdminMenu()">
+      Employee Management
+    </a>
+    </div>
+  </div>
  
   <a class="logout-link" 
    *ngIf="showLogoutLink"
@@ -55,4 +83,23 @@
      (click)="toggleMenu()">
      Login
   </a>
+</div>
+<div class="desktop-admin-dropdown" *ngIf="isAdmin">
+  <button class="admin-toggle-desktop" (click)="toggleAdminMenu()">
+    Admin Panel ▼
+  </button>
+  <div class="admin-submenu-desktop" *ngIf="isAdminMenuOpen">
+    <a routerLink="['/admin/food-management']" (click)="toggleMenu(); toggleAdminMenu()">
+      Food Management
+      </a>
+      <a routerLink="['/admin/ingredients']" (click)="toggleMenu(); toggleAdminMenu()">
+      Ingredient Management
+    </a>
+      <a [routerLink]="['/admin/drinks']" (click)="toggleMenu(); toggleAdminMenu()">
+      Drink Management
+    </a>
+    <a [routerLink]="['/admin/employees']" (click)="toggleMenu(); toggleAdminMenu()">
+      Employee Management
+    </a>
+  </div>
 </div>

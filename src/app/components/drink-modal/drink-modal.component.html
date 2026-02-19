@@ -1,0 +1,85 @@
+<!-- drink-modal.component.html -->
+<div class="drink-modal">
+  <!-- Header with drink image -->
+  <div class="drink-header">
+    <img 
+      [src]="getImageUrl()" 
+      [alt]="drink.name"
+      class="header-image"
+      (error)="handleImageError($event)"
+    />
+    <h1 class="drink-title">{{drink.name}}</h1>
+  </div>
+
+  <div class="drink-content">
+    <p class="drink-description">{{drink.description}}</p>
+
+    <div class="price-section">
+      <span class="price-label">Base Price:</span>
+      <span class="price-value">${{drink.price.toFixed(2)}}</span>
+    </div>
+
+    <!-- Size options -->
+    <div class="size-section">
+  <h3 class="section-title">Size</h3>
+  <mat-radio-group [(ngModel)]="selectedSize" (change)="updateTotalPrice()">
+    <mat-radio-button value="SMALL">
+      Small (+$0.00) - Total: ${{drink.price + 0 | number:'1.2-2'}}
+    </mat-radio-button>
+    <mat-radio-button value="MEDIUM">
+      Medium (+$1.00) - Total: ${{drink.price + 1 | number:'1.2-2'}}
+    </mat-radio-button>
+    <mat-radio-button value="LARGE">
+      Large (+$2.00) - Total: ${{drink.price + 2 | number:'1.2-2'}}
+    </mat-radio-button>
+  </mat-radio-group>
+</div>
+
+<!-- Ice options -->
+<div class="ice-section">
+  <h3 class="section-title">Ice Level</h3>
+  <mat-radio-group [(ngModel)]="selectedIceLevel" (change)="updateTotalPrice()">
+    <mat-radio-button value="NO_ICE">No Ice</mat-radio-button>
+    <mat-radio-button value="LIGHT_ICE">Light Ice</mat-radio-button> <!-- Fixed value -->
+    <mat-radio-button value="NORMAL">Regular</mat-radio-button>
+    <mat-radio-button value="WITH_ICE">With Ice</mat-radio-button>
+  </mat-radio-group>
+</div>
+
+    <!-- Quantity section -->
+    <div class="quantity-section">
+      <h3 class="section-title">Quantity</h3>
+      <div class="quantity-controls">
+        <button mat-icon-button (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+          <mat-icon>remove</mat-icon>
+        </button>
+        <span class="quantity">{{quantity}}</span>
+        <button mat-icon-button (click)="increaseQuantity()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </div>
+
+   
+    <!-- Total price -->
+    <div class="total-section">
+      <span class="total-label">Total:</span>
+      <span class="total-value">${{totalPrice.toFixed(2)}}</span>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button mat-raised-button 
+            color="primary" 
+            (click)="addToOrder()"
+            [disabled]="isAddingToCart || !isInstructionsValid">
+      <div class="button-content">
+        <span *ngIf="!isAddingToCart">Add to Order - ${{totalPrice.toFixed(2)}}</span>
+        <div *ngIf="isAddingToCart" class="loading-indicator">
+          <mat-spinner diameter="20"></mat-spinner>
+          <span>Adding...</span>
+        </div>
+      </div>
+    </button>
+  </div>
+</div>

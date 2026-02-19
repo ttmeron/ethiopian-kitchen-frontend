@@ -1,0 +1,18 @@
+ <div class="drink-card" (click)="onCardClick()">
+      <div class="drink-image-container">
+        <img 
+          [src]="getImageUrl()" 
+          [alt]="drink.name"
+          class="drink-image"
+          (error)="handleImageError($event)">
+      </div>
+      <div class="drink-info">
+        <h3 class="drink-name">{{ drink.name }}</h3>
+        <p class="drink-description">{{ drink.description }}</p>
+        <div class="drink-price">${{ drink.price.toFixed(2) }}</div>
+        <div class="drink-options">
+          <span *ngIf="drink.size" class="option-tag">Sizes</span>
+          <span *ngIf="drink.iceOption" class="option-tag">Ice Options</span>
+        </div>
+      </div>
+    </div>

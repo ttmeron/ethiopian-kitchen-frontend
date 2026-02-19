@@ -22,23 +22,25 @@ export class AuthFlowService {
     private cartService: CartService
   ) {}
 
-  // Handle login logic
   async login(credentials: { email: string; password: string }): Promise<boolean> {
+  
     try {
-      // AuthService.login() already handles token saving, user saving, and role extraction
-      const result = await firstValueFrom(
-        this.authService.login(credentials)
-      );
-      
-      this.clearGuestData();
-      return true;
-      
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+      const response = await firstValueFrom(this.authService.login(credentials));
+
+      if (response && response.token) {
+        localStorage.setItem('email', credentials.email);
+        console.log('✅ Token stored in localStorage');
+        return true;
+      }
+
+      console.warn('⚠️ No token received in login response');
+      return false;
+    } catch (err) {
+      console.error('❌ Login failed:', err);
+      throw err;
     }
   }
-  // In AuthFlowService
+  
 getCartItems(): CartItem[] {
   return this.cartService.getCartItems();
 }
@@ -47,23 +49,37 @@ getCartItems(): CartItem[] {
     localStorage.removeItem('cartItems');
   }
 
-  // Handle guest user registration
+
+  openGuestOrdersDialog(): void {
+  const dialogRef = this.dialog.open(GuestPromptDialogComponent, {
+    width: '400px',
+    data: { mode: 'viewOrders' }, 
+    disableClose: false
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result?.type === 'guestLogin') {
+      console.log('🎯 Guest logged in for order viewing:', result.email);
+      this.router.navigate(['/my-orders']);
+    }
+  });
+}
+
   registerGuest(userName: string, email: string): void {
     sessionStorage.setItem('guestEmail', email);
     sessionStorage.setItem('guestUserName', userName);
   }
 
-  // Clear guest data
   clearGuestData(): void {
     sessionStorage.removeItem('guestEmail');
     sessionStorage.removeItem('guestUserName');
   }
 
-  // Open auth dialog (for mobile/hamburger menu)
   openAuthDialog(): void {
     const dialogRef = this.dialog.open(GuestPromptDialogComponent, {
       width: '90%',
-      maxWidth: '400px'
+      maxWidth: '400px',
+    data: { mode: 'viewOrders'}
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -76,7 +92,7 @@ getCartItems(): CartItem[] {
     });
   }
 
-  // Handle logout
+  
   logout(): void {
     this.authService.logout();
     this.clearGuestData();
@@ -96,17 +112,18 @@ getCartItems(): CartItem[] {
   console.log('🧭 Navigating based on role:', role);
 
   if (role === 'ADMIN') {
-    this.router.navigate(['/orders']); // Admin view
+    this.router.navigate(['/admin/orders']); 
   } else if (role === 'USER') {
-    this.router.navigate(['/my-orders']); // Logged-in user
+    this.router.navigate(['/my-orders']); 
   } else {
-    // Guest handling
     const guestEmail = sessionStorage.getItem('guestEmail');
     if (guestEmail) {
       this.router.navigate(['/my-orders']);
     } else {
-      this.openAuthDialog(); // Opens guest prompt or login dialog
+      this.openAuthDialog(); 
     }
   }
 }
 }
+
+

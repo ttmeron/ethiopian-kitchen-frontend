@@ -38,8 +38,12 @@ Observable<HttpEvent<any>> {
       }
 
       private authenticateRequest(req: HttpRequest<any>): HttpRequest<any> {
-        // 1. Check for regular JWT auth first
         const token = this.authService.getToken();
+        const guest = this.guestAuth.currentGuestValue;
+
+        console.log('🔎 Intercepting:', req.url);
+        console.log('🔑 Token found:', !!token);
+        console.log('🧾 Guest token found:', !!guest?.token);
         if (token) {
           return req.clone({
             setHeaders: { Authorization: `Bearer ${token}` }

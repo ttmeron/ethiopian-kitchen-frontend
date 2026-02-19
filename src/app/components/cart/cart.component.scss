@@ -15,7 +15,7 @@
 $red-color: #772520;
 .mat-divider {
   border-top-color: $red-color;
-  opacity: 0.8; /* Slightly transparent */
+  opacity: 0.8; 
 }
 .h2{
   padding-bottom: 20px;
@@ -23,7 +23,6 @@ $red-color: #772520;
   font-weight: 500 bold;
   color: hsl;
   width: 100%;
-  // background-color: white;
   
 }
 .delivery-options {
@@ -107,7 +106,7 @@ $red-color: #772520;
     }
     
     .ingredient-price {
-      color: #078735; // Ethiopian green
+      color: #078735; 
     }
   }
 }
@@ -138,7 +137,7 @@ $red-color: #772520;
   
   .checkout-btn {
     flex: 1;
-    background-color: #078735; // Ethiopian green
+    background-color: #078735; 
     color: white;
     
     &:hover {
@@ -246,9 +245,6 @@ $red-color: #772520;
 .btd{
 
   background: #f9f9f9;
-  // margin-bottom: 15px;
-  // margin-right:3px;
-  // margin-left: 5px;
   padding: 3px 8px;
   &:hover {
     color: #d32f2f;
@@ -264,9 +260,6 @@ $red-color: #772520;
 }
 
 .custom-red-icon{
-  // width: 13px;
-  // height: 25px;
-  // margin-right:10px;s
   padding: 3px 8px;
   color: hsl(0, 6%, 60%); 
   &:hover {

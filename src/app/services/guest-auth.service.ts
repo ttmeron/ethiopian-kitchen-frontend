@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { BehaviorSubject, Observable, catchError, tap, throwError } from "rxjs";
 import { environment } from "../enviironments/environment";
 import { GuestUser } from "../shared/models/auth-types";
+import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable({
@@ -13,6 +14,8 @@ import { GuestUser } from "../shared/models/auth-types";
 export class GuestAuthService{
 
     private guestApi = `${environment.authApi}/guest`;
+
+private readonly GUEST_TOKEN_KEY = 'guestToken';
 
     private _currentGuestValue: GuestUser | null = null;
 
@@ -29,7 +32,7 @@ export class GuestAuthService{
 
 
     private initializeGuestSession():void{
-        const savedGuest = localStorage.getItem(this.GUEST_KEY);
+        const savedGuest = sessionStorage.getItem(this.GUEST_KEY);
         if(savedGuest){
             const guestUser: GuestUser = JSON.parse(savedGuest);
        
@@ -42,21 +45,27 @@ export class GuestAuthService{
     }
     }
 
-    // createGuestAccount(): Observable<GuestUser> {
-    //     return this.http.post<GuestUser>('/api/user/guest', {}).pipe(
-    //       tap((response) => {
-    //         this._currentGuestValue = {
-    //           ...response,
-    //           isGuest: true,
-    //           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours expiration
-    //         };
-    //       }),
-    //       catchError((error) => {
-    //         console.error('Guest creation failed:', error);
-    //         return throwError(() => new Error('Failed to create guest account'));
-    //       })
-    //     );
-    //   }
+    getGuestToken(): string {
+        let token = sessionStorage.getItem(this.GUEST_TOKEN_KEY);
+        if (!token) {
+            token = uuidv4(); // generate new token
+            this.setGuestToken(token);
+        }
+        return token;
+    }
+
+     setGuestToken(token: string): void {
+        sessionStorage.setItem(this.GUEST_TOKEN_KEY, token);
+    }
+
+    hasGuestToken(): boolean {
+        return !!sessionStorage.getItem(this.GUEST_TOKEN_KEY);
+    }
+
+
+    clearGuestToken(): void {
+      localStorage.removeItem(this.GUEST_TOKEN_KEY);
+    }
 
       createGuestAccount(): Observable<GuestUser> {
         // Add proper headers and empty body (or required structure)
@@ -98,7 +107,7 @@ export class GuestAuthService{
     }
 
       private storeGuestSession(guestUser: GuestUser): void {
-        localStorage.setItem(this.GUEST_KEY, JSON.stringify(guestUser));
+        sessionStorage.setItem(this.GUEST_KEY, JSON.stringify(guestUser));
         sessionStorage.setItem('guestToken', guestUser.token || '');
         sessionStorage.setItem('guestEmail', guestUser.email || '');
         this.guestUserSubject.next(guestUser);

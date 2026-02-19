@@ -11,7 +11,8 @@
      
         <div class="item-row">
           <div class="item-name-quantity">
-            <span>{{item.food.name}}</span>
+            <span>{{ item.food?.name || item.drinkName }}</span>
+
               <!-- <span class="quantity">{{item.quantity}}</span> -->
           </div>
           <div class="quantity-controls">
@@ -37,15 +38,12 @@
 
             <span class="ingredient-name">{{ingredient.name}} </span>
             
-
             <span class="ingredient-price"> (+{{ingredient.extraCost | currency}})</span>
           </div>
         </div>
       
     </mat-list-item>
     
-
-
     <mat-divider></mat-divider>
 
     <div class="delivery-options">
@@ -71,10 +69,10 @@
       <strong>Subtotal:</strong>
       <strong>{{getCartTotal() | currency}}</strong>
     </div>
-    <div class="price-row" *ngIf="selectedDeliveryOption === 'delivery'">
+    <!-- <div class="price-row" *ngIf="selectedDeliveryOption === 'delivery'">
       <span>Delivery Fee:</span>
       <span>{{cartService.getDeliveryFee() | currency}}</span>
-    </div>
+    </div> -->
 
     <div class="price-row">
       <span>Tax ({{cartService.TAX_RATE * 100}}%):</span>

@@ -1,25 +1,37 @@
+import { SoftDrink } from "../../services/SoftDrink.service";
 import { FoodResponse } from "./food-response.model";
 
 
 export interface CartItem {
-  food: FoodResponse;
+  id: number;
+  itemType: 'FOOD' | 'DRINK';
   quantity: number;
-  ingredients?:{
-    id: number; 
-    name: string;
-    quantity?: number;
-    extraCost: number;
-  }[];
+
+  food?: FoodResponse;
+  ingredients?: { id: number; name: string; quantity?: number; extraCost: number }[];
   specialInstructions?: string;
-  totalPrice?: number;
-  addOns?: ApiAddOn[]
-  
+
+  drink?: SoftDrink;
+  drinkName?: string;
+  price?: number;
+  unitPrice?: number;
+  size?: string;
+  iceOption?: string;
+  specialInstructionsDrink?: string;
+
+  totalPrice?: number; 
+  addOns?: ApiAddOn[];
 }
+
+ 
+
+
+
 export interface ApiAddOn {
   id: number;
   name: string;
   price: number;
-  extraCost?: number; // Optional in API response
+  extraCost?: number; 
   category?: string;
 }
   
@@ -37,6 +49,7 @@ export interface OrderResponse {
 
 
 export interface OrderItem {
+  itemType: 'FOOD' | 'DRINK';
   foodId: number;
   foodName: string;
   price: number;
@@ -44,6 +57,9 @@ export interface OrderItem {
   customIngredients: CustomIngredient[];
   addOns?: ApiAddOn[];
   specialInstructions?: string; 
+
+  size?: string;
+  iceOption?: string;
 }
 
 export interface CustomIngredient {
@@ -52,22 +68,31 @@ export interface CustomIngredient {
   quantity: number;
 }
 
-export interface OrderItemRequest {
-  foodId: number;
-  foodName: string;
-  price: number;
-  quantity: number;
-  customIngredients: CustomIngredientRequest[];
-}
-export interface OrderItemRequest {
-  foodId: number;
-  foodName: string;
-  price: number;
-  quantity: number;
-  customIngredients: OrderItemIngredientRequest[];
-  addOns?: AddOnRequest[];
-  specialInstructions?: string;
-}
+
+export type OrderItemRequest =
+  | {
+      itemType: 'FOOD';
+      foodId: number;
+      foodName: string;
+      quantity: number;
+      price: number;
+      customIngredients: OrderItemIngredientRequest[];
+      addOns?: AddOnRequest[];
+      specialInstructions?: string;
+    }
+  | {
+      itemType: 'DRINK';
+      drinkId: number;
+      drinkName: string;
+      quantity: number;
+      price: number;
+      size?: string;
+      iceOption?: string;
+      addOns?: AddOnRequest[];
+      specialInstructions?: string;
+    };
+
+
 export interface AddOnRequest {
   addOnId: number;
   name: string;
@@ -88,6 +113,7 @@ export interface OrderItemIngredientRequest {
   }
 
   export interface CreateOrderRequest {
+
     email: string;
     userName: string;
     orderItems: OrderItemRequest[];
@@ -95,4 +121,5 @@ export interface OrderItemIngredientRequest {
     specialInstructions?: string;
     totalPrice: number;
     isGuestOrder?: boolean;
+    isGuest:boolean;
   }

@@ -70,7 +70,6 @@
   }
 }
 
-// Make payment method field same width as card details
 .payment-method-group {
   width: 100%;
   
@@ -79,7 +78,6 @@
   }
 }
 
-// Card form group to ensure consistent width
 .card-form-group {
   width: 100%;
   display: flex;
@@ -89,14 +87,13 @@
 
 .form-group {
   width: 100%;
-  margin-bottom: 0; // Remove bottom margin since we use gap
+  margin-bottom: 0; 
 }
 
 .full-width {
   width: 100%;
 }
 
-// Card details group - make it same width as payment method field
 .card-details-group {
   width: 100%;
   
@@ -241,7 +238,6 @@
   gap: 8px;
 }
 
-// Material form field customization to ensure consistent width
 ::ng-deep {
   .mat-form-field {
     width: 100%;
@@ -287,7 +283,6 @@
     font-size: 12px;
   }
   
-  // Ensure select dropdown matches the width
   .mat-select-panel {
     min-width: 100% !important;
   }

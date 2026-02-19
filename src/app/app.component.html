@@ -1,8 +1,8 @@
-<app-header></app-header>
+<!-- Only show header on non-auth routes -->
+<app-header *ngIf="shouldShowHeader()"></app-header>
 
 <div [attr.inert]="isModalOpen ? '' : null">
   <router-outlet></router-outlet>
 </div>
 
-<!-- Modal or overlay (e.g., cart or payment form) -->
 <app-payment *ngIf="isModalOpen" (close)="closeModal()"></app-payment>

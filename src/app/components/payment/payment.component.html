@@ -1,5 +1,4 @@
 <div class="payment-container">
-  <!-- Header Section -->
   <div class="payment-header">
     <div class="header-content">
       <h2>{{ getPaymentTitle() }}</h2>
@@ -13,11 +12,9 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="payment-content">
     <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="payment-form">
       
-      <!-- Payment Method Selection -->
       <div class="form-section">
         <h3 class="section-title">Select Payment Method</h3>
         <div class="form-group payment-method-group">
@@ -35,7 +32,6 @@
         </div>
       </div>
 
-      <!-- Credit Card Form - Show when Credit Card is selected -->
       <div class="form-section" *ngIf="paymentForm.get('paymentMethod')?.value === 'Credit Card'">
         <h3 class="section-title">Card Information</h3>
         
@@ -52,7 +48,6 @@
 
           <div class="form-group card-details-group">
             <label class="card-label">Card Details *</label>
-            <!-- Stripe Card Element will be mounted here -->
             <div id="card-element" #cardElement class="card-element"></div>
             <div class="card-hint">Enter your card number, expiry date, and CVC</div>
             <div *ngIf="errorMessage" class="stripe-error">
@@ -68,7 +63,6 @@
         </div>
       </div>
 
-      <!-- Other Payment Methods -->
       <div class="form-section" *ngIf="paymentForm.get('paymentMethod')?.value === 'PayPal'">
         <h3 class="section-title">PayPal Payment</h3>
         <div class="alternative-payment">
@@ -83,7 +77,6 @@
         </div>
       </div>
 
-      <!-- Footer with Total and Actions -->
       <div class="payment-footer">
         <div class="total-section">
           <div class="total-line">

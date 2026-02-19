@@ -1,32 +1,57 @@
 <div class="menu-container">
-  <h1 class="restaurant-name">ETHIOPIAN KITCHEN</h1>
-  
+
+  <!-- CATEGORY FILTER -->
   <div class="category-filter">
     <button 
       *ngFor="let category of categories"
       [class.active]="category === selectedCategory"
       (click)="filterByCategory(category)"
-      class="category-btn"
-    >
+      class="category-btn">
       {{ category }}
     </button>
   </div>
 
-  <div *ngIf="isLoading" class="loading">Loading menu...</div>
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="loading">
+    Loading menu...
+  </div>
 
+  <!-- ERROR -->
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
     <button (click)="retryLoading()">Retry</button>
   </div>
+<div class="menu-items" *ngIf="!isLoading && !errorMessage">
 
-  <div class="menu-items" *ngIf="!isLoading && !errorMessage">
-    <app-food-item 
-      *ngFor="let food of filteredFoods"
-      [food]="food"
-    ></app-food-item>
-    
-    <div *ngIf="filteredFoods.length === 0" class="no-items">
-      No items available in this category.
+  <!-- Food section -->
+  <ng-container *ngIf="foodItems.length">
+    <div *ngIf="isAllCategory" class="category-separator">Food</div>
+    <div class="items-grid">
+    <ng-container *ngFor="let food of foodItems">
+      <div class="grid-item"> 
+      <app-food-item [food]="convertItem(food)"></app-food-item>
+      </div>
+    </ng-container>
+</div>
+  </ng-container>
+
+  <!-- Drinks section -->
+  <ng-container *ngIf="drinkItems.length">
+  <div *ngIf="isAllCategory" class="category-separator">Drinks</div>
+  <div class="items-grid">
+    <div *ngFor="let drink of drinkItems" class="grid-item">
+      <app-drink-item 
+        [drink]="drink" 
+        (drinkClicked)="onDrinkClick(drink)">
+      </app-drink-item>
     </div>
+  </div>  
+</ng-container>  
+  <!-- No items -->
+  <div *ngIf="filteredItems.length === 0" class="no-items">
+    No items available in this category.
   </div>
+
+</div>
+
 </div>

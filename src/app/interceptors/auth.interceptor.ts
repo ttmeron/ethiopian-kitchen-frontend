@@ -6,32 +6,37 @@ import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  
+private readonly EXCLUDED_ENDPOINTS = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/forgot-password',
+    '/user/guest'
+  ];
+
   constructor(private authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Clone the request and add the authorization header
-    const authReq = this.addTokenToRequest(req);
     
-    return next.handle(authReq);
-  }
+    if (this.isExcluded(req.url)) {
+      return next.handle(req);
+    }
 
-  private addTokenToRequest(req: HttpRequest<any>): HttpRequest<any> {
+   
     const token = this.authService.getToken();
-    
-    if (token && this.isAdminEndpoint(req.url)) {
-      return req.clone({
+    if (token) {
+      const clonedReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         }
       });
+      return next.handle(clonedReq);
     }
-    
-    return req;
+
+   
+    return next.handle(req);
   }
 
-  private isAdminEndpoint(url: string): boolean {
-    // Check if the URL contains admin paths
-    return url.includes('/admin/');
+  private isExcluded(url: string): boolean {
+    return this.EXCLUDED_ENDPOINTS.some(endpoint => url.includes(endpoint));
   }
 }

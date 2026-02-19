@@ -2,38 +2,75 @@
   <mat-icon class="cancel-icon" (click)="closeCheckout()">close</mat-icon>
   
   <div class="checkout-header">
-    <h2>Checkout Options</h2>
-    
-    <p *ngIf="!loginMode && !guestMode">
+    <!-- Dynamic title based on mode -->
+    <h2 *ngIf="!loginMode && !guestMode && !isViewOrdersMode()">Checkout Options</h2>
+  <h2 *ngIf="!loginMode && !guestMode && isViewOrdersMode()">View Your Order</h2>
+  
+  <!-- Guest mode titles - these need to be checked first -->
+  <h2 *ngIf="guestMode && !isViewOrdersMode()">Continue as Guest</h2>
+  <h2 *ngIf="guestMode && isViewOrdersMode()">View Your Order</h2>
+  
+  <!-- Login mode title -->
+  <h2 *ngIf="loginMode">Login</h2>
+  
+    <!-- Dynamic description -->
+    <p *ngIf="!isViewOrdersMode() && !loginMode && !guestMode">
       You are not logged in. Choose an option to continue:
     </p>
     
-    <p *ngIf="loginMode">
-      To log in, please use the email you used when creating your account.
+    <p *ngIf="isViewOrdersMode() && !loginMode && !guestMode">
+      Please login or continue as guest to view your orders
     </p>
     
-    <p *ngIf="guestMode">
+    <p *ngIf="loginMode">
+      Enter your credentials to access your account
+    </p>
+    
+    <p *ngIf="guestMode && !isViewOrdersMode()">
       You can create an account later after placing your order.
+    </p>
+    
+    <p *ngIf="isViewOrdersMode() && guestMode">
+      Enter your name and email to view your order history
     </p>
   </div>
 
-  <!-- Guest/Login/Register Buttons -->
+  <!-- Guest/Login/Register Buttons - Only show when NOT in login or guest mode -->
   <div *ngIf="!guestMode && !loginMode" class="button-group">
-    <button mat-raised-button color="primary" (click)="continueAsGuest()">Continue as Guest</button>
-    <button mat-raised-button color="accent" (click)="showLoginForm()">Login</button>
-    <button mat-raised-button color="warn" (click)="goToRegister()">Register</button>
+    <button mat-raised-button color="primary" (click)="continueAsGuest()">
+      {{ isViewOrdersMode() ? 'Continue as Guest' : 'Continue as Guest' }}
+    </button>
+    <button mat-raised-button color="accent" (click)="showLoginForm()">
+      {{ isViewOrdersMode() ? 'Login' : 'Login' }}
+    </button>
+    <!-- Register button is hidden in view orders mode -->
+    <button mat-raised-button color="warn" (click)="goToRegister()" *ngIf="!isViewOrdersMode()">
+      Register
+    </button>
   </div>
 
   <!-- Guest Form -->
   <div *ngIf="guestMode" class="guest-form">
     <mat-form-field appearance="outline">
       <mat-label>Name</mat-label>
-      <input matInput [(ngModel)]="userName" required>
+      <input matInput [(ngModel)]="userName" #name="ngModel" required>
+      <mat-error *ngIf="name.invalid && name.touched">
+        Name is required
+      </mat-error>
     </mat-form-field>
-  
+
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input matInput [(ngModel)]="email" type="email" required>
+      <input matInput 
+             [(ngModel)]="email" 
+             #emailInput="ngModel"
+             type="email" 
+             required
+             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+      <mat-error *ngIf="emailInput.invalid && emailInput.touched">
+        <span *ngIf="emailInput.errors?.['required']">Email is required</span>
+        <span *ngIf="emailInput.errors?.['pattern']">Please enter a valid email address</span>
+      </mat-error>
     </mat-form-field>
   
     <div *ngIf="errorMessage" class="error-message">
@@ -45,9 +82,14 @@
               color="primary" 
               (click)="confirmGuest()"
               [disabled]="isLoading">
-        {{ isLoading ? 'Processing...' : 'Confirm' }}
+        {{ isLoading ? 'Processing...' : isViewOrdersMode() ? 'View Orders' : 'Confirm' }}
       </button>
       <button mat-stroked-button (click)="cancelgust()">Cancel</button>
+    </div>
+    
+    <!-- Back to options link for guest form -->
+    <div class="back-link" *ngIf="!isViewOrdersMode()">
+      <a (click)="cancelgust()">← Back to checkout options</a>
     </div>
   </div>
 
@@ -65,7 +107,6 @@
              [type]="hidePassword ? 'password' : 'text'" 
              required>
       
-      <!-- Password visibility toggle button -->
       <button mat-icon-button 
               matSuffix 
               type="button"
@@ -80,15 +121,22 @@
     </div>
 
     <button mat-raised-button 
-            color="primary" 
+    class="b1"
+            color="green" 
             (click)="submitLogin()"
             [disabled]="isLoading">
       {{ isLoading ? 'Logging in...' : 'Login' }}
     </button>
 
     <div class="links">
-      <a (click)="navigateToRegister()">Create account</a>
+      <!-- Hide create account link in view orders mode -->
+      <a *ngIf="!isViewOrdersMode()" (click)="navigateToRegister()">Create account</a>
       <a (click)="forgotPassword()">Forgot password?</a>
+    </div>
+    
+    <!-- Back to options link for login form -->
+    <div class="back-link">
+      <a (click)="cancelLogin()">← Back to checkout options</a>
     </div>
   </div>
 </div>

@@ -18,10 +18,11 @@ import { OrderService } from '../../services/order.service';
 import { firstValueFrom } from 'rxjs';
 
 
-import { GuestPaymentRequest, PaymentDto } from '../../shared/models/order.model';
+import { GuestPaymentRequest } from '../../shared/models/order.model';
 import { CartService } from '../../services/cart.service';
-import { MatButton, MatButtonModule } from '@angular/material/button';
+import {  MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { GuestAuthService } from '../../services/guest-auth.service';
 
 export interface PaymentDialogData {
   totalAmount: number;
@@ -31,8 +32,12 @@ export interface PaymentDialogData {
   guestName: string;
   guestEmail: string;
   guestOrderItems?: any[]; 
+  guestOrder?: GuestPaymentRequest; 
   specialInstructions?: string;
   clientSecret?: string;
+  guestToken?: string; 
+
+  paymentAlreadyInitiated?: boolean;
   
 }
 
@@ -82,6 +87,7 @@ export class PaymentComponent implements OnInit {
     private cartService: CartService,
     private fb: FormBuilder,
     private orderService: OrderService,
+    private guestAuthService: GuestAuthService,
     @Inject(MAT_DIALOG_DATA) public data: PaymentDialogData, 
     private dialogRef: MatDialogRef<PaymentComponent>
   ) {}
@@ -94,31 +100,26 @@ export class PaymentComponent implements OnInit {
       rememberCard: [false]   
     });
 
-    // Listen for form changes to update title
     this.paymentForm.get('paymentMethod')?.valueChanges.subscribe(value => {
       this.paymentTitle = value ? 'Payment Details' : 'Choose Payment Method';
     });
 
-    // Initialize Stripe but don't create card element yet
     this.stripe = await this.stripePromise;
     if (!this.stripe) {
       console.error('Stripe failed to initialize');
       return;
     }
 
-    // Initialize elements but wait for payment method selection to mount
     this.elements = this.stripe.elements();
   }
 
   onPaymentMethodChange() {
     const selectedMethod = this.paymentForm.get('paymentMethod')?.value;
     
-    // Reset card validation errors when payment method changes
     if (selectedMethod !== 'Credit Card') {
       this.errorMessage = null;
     }
     
-    // Clear card name requirement if not using card
     if (selectedMethod !== 'Credit Card') {
       this.paymentForm.get('cardName')?.clearValidators();
     } else {
@@ -126,13 +127,11 @@ export class PaymentComponent implements OnInit {
     }
     this.paymentForm.get('cardName')?.updateValueAndValidity();
     
-    // Initialize Stripe card element when Credit Card is selected
     if (selectedMethod === 'Credit Card') {
       setTimeout(() => {
         this.initializeStripeCardElement();
-      }, 100); // Small delay to ensure the DOM is updated
+      }, 100); 
     } else if (this.card) {
-      // Unmount card element if switching away from Credit Card
       this.card.unmount();
       this.card = null as any;
     }
@@ -144,12 +143,10 @@ export class PaymentComponent implements OnInit {
       return;
     }
 
-    // If card element already exists, unmount it first
     if (this.card) {
       this.card.unmount();
     }
 
-    // Create and mount new card element
     this.card = this.elements.create('card', {
       style: {
         base: {
@@ -198,126 +195,248 @@ export class PaymentComponent implements OnInit {
       this.confirmPayment();
     } else {
       this.errorMessage = 'Please fill in all required fields.';
-      // Mark all fields as touched to show validation errors
       Object.keys(this.paymentForm.controls).forEach(key => {
         this.paymentForm.get(key)?.markAsTouched();
       });
     }
   }
 
-  // ADD THIS MISSING METHOD
+
   async confirmPayment() {
-    if (!this.paymentForm.valid) return;
-    if (!this.stripe || !this.card) {
-      this.errorMessage = 'Stripe is not initialized.';
-      return;
-    }
+  console.log(' DEBUG: this.data.cartItems:', this.data.cartItems);
   
-    this.isProcessing = true;
-    this.errorMessage = null;
+  const freshCartItems = this.cartService.getCartItems();
+  console.log(' DEBUG: Fresh cart items from service:', freshCartItems);
+  
+  if (freshCartItems) {
+    freshCartItems.forEach((item, index) => {
+      console.log(`Fresh cart item ${index}:`, {
+        itemType: item.itemType,
+        drinkName: item.drink?.name,
+        size: item.size,
+        iceOption: item.iceOption,
+        hasSize: 'size' in item,
+        hasIceOption: 'iceOption' in item,
+        allProperties: Object.keys(item)
+      });
+    });
+  }
 
-    try {
-      let clientSecret: string;
+  if (!this.paymentForm.valid) return;
+  if (!this.stripe || !this.card) {
+    this.errorMessage = 'Stripe is not initialized.';
+    return;
+  }
 
-      if (this.data.isGuest) {
-        const cartItems = this.cartService.getCartItems();
-        if (!cartItems || cartItems.length === 0) return;
+  this.isProcessing = true;
+  this.errorMessage = null;
 
-        const subtotal = this.cartService.calculateOrderSubtotal(cartItems);
+  try {
+    let clientSecret: string;
+
+    if (this.data.isGuest) {
+      if (this.data.clientSecret) {
+        clientSecret = this.data.clientSecret;
+        console.log('🔄 Using pre-initiated payment intent from guest dialog');
+      } else {
+        if (!freshCartItems || freshCartItems.length === 0) return;
+
+        const subtotal = this.cartService.calculateOrderSubtotal(freshCartItems);
         const tax = this.cartService.calculateTax();
         const deliveryFee = this.cartService.getDeliveryFee();
         const totalAmount = subtotal + tax + deliveryFee;
 
+        const guestToken = this.data.guestToken || this.guestAuthService.getGuestToken();
+        console.log(' Payment using guestToken:', guestToken);
+
         const guestPaymentPayload: GuestPaymentRequest = {
           guestName: this.data.guestName || 'Guest',
           guestEmail: this.data.guestEmail || '',
-          orderItemDTOS: this.data.cartItems?.map(item => ({
-            foodId: item.food.id,
-            foodName: item.food.name,
-            price: this.cartService.calculateItemTotal(item),
-            quantity: item.quantity,
-            customIngredients: this.mapIngredients(item.ingredients || [])
-          })) || [],
+          guestToken: guestToken,
+          orderItemDTOS: freshCartItems.map(item => {  
+            if (item.itemType === 'FOOD' && item.food) {
+              return {
+                itemType: 'FOOD' as const,
+                foodId: item.food.id,
+                foodName: item.food.name,
+                price: this.cartService.calculateItemTotal(item) ?? 0,
+                quantity: item.quantity,
+                customIngredients: this.mapIngredients(item.ingredients ?? [])
+              };
+            }
+            
+            if (item.itemType === 'DRINK' && item.drink) {
+              console.log('🧃 Adding drink to guest payload from fresh cart:', {
+                drinkId: item.drink.id,
+                size: item.size,
+                iceOption: item.iceOption,
+                hasSize: 'size' in item,
+                hasIceOption: 'iceOption' in item,
+                fullItem: item
+              });
+              
+              const sizeValue = item.size || 'MEDIUM';
+              const iceOptionValue = item.iceOption || 'WITH_ICE';
+              
+              return {
+                itemType: 'DRINK' as const,
+                drinkId: item.drink.id,
+                drinkName: item.drink.name,
+                price: this.cartService.calculateItemTotal(item) ?? 0,
+                quantity: item.quantity,
+                size: sizeValue,
+                iceOption: iceOptionValue,
+                customIngredients: []
+              };
+            }
+            
+            console.error('Invalid cart item:', item);
+            return null;
+          }).filter(item => item !== null) as any[],
+
           totalAmount,
           specialInstructions: this.data.specialInstructions || ''
         };
 
+        console.log('GuestPaymentPayload created:', JSON.stringify(guestPaymentPayload, null, 2));
+        
         const paymentResponse = await firstValueFrom(
           this.orderService.initiateGuestPayment(guestPaymentPayload)
         );
 
         clientSecret = paymentResponse.clientSecret;
+      }
 
-        const result = await this.stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: this.card,
-            billing_details: {
-              name: this.paymentForm.get('cardName')?.value || this.data.guestName || 'Guest',
-              email: this.data.guestEmail
-            }
+      const result = await this.stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: this.card,
+          billing_details: {
+            name: this.paymentForm.get('cardName')?.value || this.data.guestName || 'Guest',
+            email: this.data.guestEmail
           }
-        });
-
-        if (result.error) {
-          this.errorMessage = result.error.message || null;
-          return;
         }
+      });
 
-        if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
-          const savedOrder = await firstValueFrom(
-            this.orderService.confirmPayment(
-              result.paymentIntent.id,
-              this.data.guestEmail || '',
-              this.data.guestName || 'Guest',
-              guestPaymentPayload
-            )
-          );
+      if (result.error) {
+        this.errorMessage = result.error.message || null;
+        return;
+      }
 
-          console.log('Guest order saved:', savedOrder);
-          this.cartService.clearCart();
-          this.dialogRef.close({ success: true, order: savedOrder });
-        }
-          
-      } else {
-        const paymentResponse = await firstValueFrom(
-          this.orderService.initiateUserPayment(this.data.orderId, this.data.totalAmount)
+      if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+       
+        const guestPaymentPayload: GuestPaymentRequest = {
+          guestName: this.data.guestName || 'Guest',
+          guestEmail: this.data.guestEmail || '',
+          guestToken: this.data.guestToken || this.guestAuthService.getGuestToken(),
+          orderItemDTOS: freshCartItems.map(item => {  
+            if (item.itemType === 'FOOD' && item.food) {
+              return {
+                itemType: 'FOOD' as const,
+                foodId: item.food.id,
+                foodName: item.food.name,
+                quantity: item.quantity,
+                price: this.cartService.calculateItemTotal(item) ?? 0,
+                customIngredients: item.ingredients
+                    ?.filter(ing => ing.id != null)
+                    .map(ing => ({
+                      ingredientId: ing.id!,
+                      ingredientName: ing.name,
+                      extraCost: ing.extraCost,
+                      quantity: 1
+                    })) || []
+              };
+            }
+
+            if (item.itemType === 'DRINK' && item.drink) {
+              console.log('🧃 Final drink item for confirmation from fresh cart:', {
+                drinkId: item.drink.id,
+                size: item.size,
+                iceOption: item.iceOption,
+                fullItem: item
+              });
+              
+              const sizeValue = item.size || 'MEDIUM';
+              const iceOptionValue = item.iceOption || 'WITH_ICE';
+              
+              return {
+                itemType: 'DRINK' as const,
+                drinkId: item.drink.id,
+                drinkName: item.drink.name,
+                quantity: item.quantity,
+                price: this.cartService.calculateItemTotal(item) ?? 0,
+                size: sizeValue,         
+                iceOption: iceOptionValue,
+                customIngredients: []
+              };
+            }
+
+            console.error('Invalid cart item:', item);
+            return null;
+          }).filter(item => item !== null) as any[],
+
+          totalAmount: this.data.totalAmount,
+          specialInstructions: this.data.specialInstructions || ''
+        };
+
+        console.log('📤 Final GuestPaymentPayload for confirmation:', JSON.stringify(guestPaymentPayload, null, 2));
+        
+        const savedOrder = await firstValueFrom(
+          this.orderService.confirmPayment(
+            result.paymentIntent.id,
+            this.data.guestEmail || '',
+            this.data.guestName || 'Guest',
+            guestPaymentPayload
+          )
         );
 
-        clientSecret = paymentResponse.clientSecret;
-
-        const result = await this.stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: this.card,
-            billing_details: {
-              name: this.paymentForm.get('cardName')?.value || 'User'
-            }
-          }
-        });
-  
-        if (result.error) {
-          this.errorMessage = result.error.message ?? null;
-          return;
-        }
-
-        if (result.paymentIntent?.status === 'succeeded') {
-          const savedOrder = await firstValueFrom(
-            this.orderService.confirmUserPayment(this.data.orderId, result.paymentIntent.id)
-          );
-
-          console.log('User order saved:', savedOrder);
-          this.cartService.clearCart();
-          this.dialogRef.close({ success: true, order: savedOrder });
-        }
+        console.log('Guest order saved:', savedOrder);
+        this.cartService.clearCart();
+        localStorage.removeItem('guestEmail');
+        localStorage.removeItem('guestName');
+        sessionStorage.removeItem('guestEmail');
+        sessionStorage.removeItem('guestName');
+        this.dialogRef.close({ success: true, order: savedOrder });
       }
-  
-    } catch (err: any) {
-      console.error('Error during payment flow:', err);
-      this.errorMessage = err?.message || 'Payment failed';
-    } finally {
-      this.isProcessing = false;
-    }
-  }
 
+    } else {
+      const paymentResponse = await firstValueFrom(
+        this.orderService.initiateUserPayment(this.data.orderId, this.data.totalAmount)
+      );
+
+      clientSecret = paymentResponse.clientSecret;
+
+      const result = await this.stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: this.card,
+          billing_details: {
+            name: this.paymentForm.get('cardName')?.value || 'User'
+          }
+        }
+      });
+
+      if (result.error) {
+        this.errorMessage = result.error.message ?? null;
+        return;
+      }
+
+      if (result.paymentIntent?.status === 'succeeded') {
+        const savedOrder = await firstValueFrom(
+          this.orderService.confirmUserPayment(this.data.orderId, result.paymentIntent.id)
+        );
+
+        console.log('User order saved:', savedOrder);
+        this.cartService.clearCart();
+        this.dialogRef.close({ success: true, order: savedOrder });
+      }
+    }
+
+  } catch (err: any) {
+    console.error('Error during payment flow:', err);
+    this.errorMessage = err?.message || 'Payment failed';
+  } finally {
+    this.isProcessing = false;
+  }
+}
   private mapIngredients(ingredients: any[]): any[] {
     return ingredients.map(ing => ({
       ingredientId: ing.id,
@@ -326,7 +445,7 @@ export class PaymentComponent implements OnInit {
     }));
   }
 
-  // ADD THIS MISSING METHOD
+
   closeDialog(): void {
     this.dialogRef.close();
   }

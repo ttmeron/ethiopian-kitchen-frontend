@@ -1,0 +1,141 @@
+<div class="about-contact">
+  <div class="content-wrapper">
+   
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        [class.active]="activeTab === 'about'" 
+        (click)="activeTab = 'about'">
+        About Us
+      </button>
+      <button 
+        [class.active]="activeTab === 'contact'" 
+        (click)="activeTab = 'contact'">
+        Contact Us
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="tab-content">
+      @if (activeTab === 'about') {
+        <div class="about-content">
+          <h3>Our Story: From Family Kitchen to Community Table</h3>
+        
+          <div class="story-content">
+            <p>
+              Our journey began in the warmth of a family kitchen, where generations of Ethiopian culinary 
+              traditions came alive. What started as cooking authentic meals for family gatherings soon 
+              became a shared passion with friends and community.
+            </p>
+
+            @for (milestone of storyMilestones; track milestone.title) {
+              <div class="story-milestone">
+                <div class="milestone-content">
+                  <h4>{{ milestone.title }}</h4>
+                  <p>{{ milestone.description }}</p>
+                </div>
+              </div>
+            }
+            
+            <p>
+              Today, we continue this journey, inviting you to experience the authentic flavors and warm 
+              hospitality that started it all. Every dish we serve carries the love and tradition of 
+              Ethiopian home cooking.
+            </p>
+            
+            <h3>Traditional Ethiopian Dining</h3>
+            <div class="features">
+              <div class="feature">
+                <span class="icon">🫓</span>
+                <h4>Injera</h4>
+                <p>Traditional sourdough flatbread made from teff flour</p>
+              </div>
+              <div class="feature">
+                <span class="icon">☕</span>
+                <h4>Coffee Ceremony</h4>
+                <p>Authentic Ethiopian coffee experience</p>
+              </div>
+              <div class="feature">
+                <span class="icon">👨‍👩‍👧‍👦</span>
+                <h4>Communal Dining</h4>
+                <p>Share meals from a common platter</p>
+              </div>
+            </div>
+          </div> 
+        </div> 
+      } @else {
+        <div class="contact-content">
+          <div class="contact-info">
+            <h3>Visit Us</h3>
+            <div class="info-item">
+              <span class="icon">📍</span>
+              <div>
+                <strong>Address</strong>
+                <p>808 South Falcon Street<br>Anaheim, California</p>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <span class="icon">📞</span>
+              <div>
+                <strong>Phone</strong>
+                <p>+714 803 8141</p>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <span class="icon">✉️ሠ</span>
+              <div>
+                <strong>Email</strong>
+                <p>info&#64;ethiopiankitchen.com</p>
+              </div>
+            </div>
+          </div>
+
+      
+
+          <!-- Simple Contact Form -->
+       <div class="contact-form">
+  <h3>Send us a Message</h3>
+  <form (ngSubmit)="onSubmit($event)" #contactForm="ngForm">
+    <input 
+      type="text" 
+      [(ngModel)]="formData.name"
+      name="name"
+      placeholder="Your Name" 
+      required
+      [disabled]="isLoading">
+    
+    <input 
+      type="email" 
+      [(ngModel)]="formData.email"
+      name="email"
+      placeholder="Your Email" 
+      required
+      [disabled]="isLoading">
+    
+    <textarea 
+      [(ngModel)]="formData.message"
+      name="message"
+      placeholder="Your Message" 
+      rows="4" 
+      required
+      [disabled]="isLoading"></textarea>
+    
+    <button 
+      type="submit" 
+      [disabled]="isLoading || contactForm.invalid">
+      
+      @if (isLoading) {
+        <span class="loading">⏳</span> Sending...
+      } @else {
+        Send Message
+      }
+    </button>
+  </form>
+</div>
+        </div>
+      }
+    </div> 
+  </div>
+</div> 

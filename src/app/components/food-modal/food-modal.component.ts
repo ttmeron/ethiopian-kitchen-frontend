@@ -89,13 +89,16 @@ export class FoodModalComponent {
       console.log('🔎 Selected ingredients for cart:', selectedIngredients);
   
       const cartItem: CartItem = {
+        id: Date.now(),
+        itemType: 'FOOD',
         food: this.data.food,
         quantity: this.quantity,
         ingredients: selectedIngredients,
         specialInstructions: this.specialInstructions,
+        price: this.data.food.price,
         totalPrice: this.totalPrice
       };
-  
+        
       console.log('🔎 Final CartItem with ingredients:', cartItem);
       
       await this.cartService.addToCart(cartItem);
@@ -122,7 +125,7 @@ export class FoodModalComponent {
     console.log('🔎 === INGREDIENT PRICE DEBUG ===');
     console.log('Raw ingredients data from API:', this.data.food.ingredients);
     
-    // Detailed inspection of each ingredient
+    
     this.data.food.ingredients?.forEach((ingredient, index) => {
       console.log(`Ingredient ${index}:`);
       console.log('  Name:', ingredient.name);
@@ -132,9 +135,8 @@ export class FoodModalComponent {
       console.log('  Full object:', JSON.stringify(ingredient));
     });
     
-    // Ingredients now come with IDs from the API - no mapping needed!
     this.ingredientsWithSelection = this.data.food.ingredients?.map(ingredient => ({
-      id: ingredient.id,        // ← Now comes directly from API
+      id: ingredient.id,     
       name: ingredient.name,
       price: ingredient.extraCost,
       extraCost: ingredient.extraCost,
@@ -143,7 +145,7 @@ export class FoodModalComponent {
     
     console.log('🔎 Final processed ingredients with API IDs:', this.ingredientsWithSelection);
     
-    // Verify the prices one more time
+   
     this.ingredientsWithSelection.forEach(ing => {
       console.log(`✅ ${ing.name}: extraCost = ${ing.extraCost}, price = ${ing.price}`);
     });

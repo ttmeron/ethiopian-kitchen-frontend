@@ -27,7 +27,7 @@
     font-weight: 700;
     font-size: 1.8rem;
   }
-
+  
   .form-group {
     margin-bottom: 1.5rem;
 
@@ -39,7 +39,7 @@
       }
 
       .mat-form-field-outline-thick {
-        color: #078735; /* Ethiopian green */
+        color: #078735;
       }
 
       .mat-input-element {
@@ -49,8 +49,6 @@
       mat-label {
         color: #666;
       }
-
-      /* Style for password field with visibility toggle */
       .mat-icon-button {
         width: 40px;
         height: 40px;
@@ -66,7 +64,7 @@
 
         &:hover {
           .mat-icon {
-            color: #078735; /* Ethiopian green on hover */
+            color: #078735; 
           }
         }
 
@@ -78,7 +76,7 @@
   }
 
   button[type="submit"] {
-    background-color: #078735; /* Ethiopian green */
+    background-color: #078735;
     color: white;
     width: 100%;
     padding: 12px;
@@ -89,12 +87,12 @@
     margin-top: 1rem;
 
     &:hover {
-      background-color: #056b2b; /* Darker green */
+      background-color: #056b2b;
       transform: translateY(-2px);
     }
 
     &:disabled {
-      background-color: #8fc19e; /* Muted green */
+      background-color: #8fc19e;
       cursor: not-allowed;
     }
   }
@@ -104,14 +102,14 @@
     text-align: center;
 
     a {
-      color: #b29c0c; /* Ethiopian yellow */
+      color: #b29c0c;
       text-decoration: none;
       font-weight: 500;
       margin: 0 10px;
       transition: all 0.2s ease;
 
       &:hover {
-        color: #e6c407; /* Darker yellow */
+        color: #e6c407;
         text-decoration: underline;
       }
     }
@@ -126,14 +124,13 @@
     text-align: center;
   }
 
-  /* Ethiopian flag inspired accents */
   .flag-accent {
     height: 4px;
     background: linear-gradient(
       to right,
-      #078735 33%,  /* Green */
-      #fcdd09 33% 66%,  /* Yellow */
-      #e74c3c 66%  /* Red */
+      #078735 33%, 
+      #fcdd09 33% 66%,  
+      #e74c3c 66%  
     );
     margin: 1rem 0;
     border-radius: 2px;

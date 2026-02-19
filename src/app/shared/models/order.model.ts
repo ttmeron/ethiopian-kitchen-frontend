@@ -9,7 +9,9 @@ export enum OrderStatus {
     COMPLETED = 'COMPLETED',
     CANCELLED = 'CANCELLED',
     PAYMENT_FAILED = 'PAYMENT_FAILED',
-    PROCESSING = 'PROCESSING'
+    PROCESSING = 'PROCESSING',
+    CONFIRMED = 'CONFIRMED'
+
 
 
   } 
@@ -30,27 +32,38 @@ export enum OrderStatus {
     READY = 'ready'
   }
   
+  
   export interface CustomIngredient {
     ingredientId?: number;
-    ingredientName?: string; // Added for display purposes
+    ingredientName?: string; 
     extraCost: number;
     quantity: number;
   }
   
   export interface OrderItem {
+    itemType: 'FOOD' | 'DRINK';
     foodId: number;
     foodName: string;
+    drinkName: string;
     price: number;
+    
     quantity: number;
+
+    size?: string;
+    iceOption?: string;
     customIngredients: CustomIngredient[];
     specialInstructions?: string; 
   }
   
   export interface OrderTiming {
-    placedTime?: string; // ISO string
+    placedTime?: string; 
     estimatedReadyTime?: Date;
-    remainingTime?: number; // in minutes
+    remainingTime: number; 
     timerStatus?: TimerStatus;
+
+
+  remainingSeconds?: number;
+  totalRemainingSeconds?: number;
     
   }
   export interface DeliveryDTO {
@@ -61,13 +74,14 @@ export enum OrderStatus {
   export interface OrderResponse extends OrderTiming {
     orderId: number;
     totalPrice: number;
-    orderNumber: string;            // ✅ Add this
+    orderNumber: string;            
     placedTime: string;
-    status: OrderStatus; // Changed to enum
+    status: OrderStatus; 
     userName: string;
     email: string;
     orderItems: OrderItem[];
     deliveryDTO?: DeliveryDTO;
+    
   }
 
   export interface GuestOrderResponse extends OrderResponse {
@@ -78,23 +92,48 @@ export enum OrderStatus {
 
 }
 
+
+export type GuestOrderItemDTO =
+  | {
+      itemType: 'FOOD';
+      foodName: string;
+      foodId: number;
+      quantity: number;
+      price: number;
+      customIngredients: {
+        ingredientId?: number;
+        ingredientName: string;
+        extraCost: number;
+        quantity: number;
+      }[];
+    }
+  | {
+      itemType: 'DRINK';
+      drinkId: number;
+      drinkName: string;
+      quantity: number;
+      price: number;
+      iceOption: string;  
+      size: string; 
+      customIngredients: [];
+    };
+
+
 export interface GuestPaymentRequest {
   guestName: string;
   guestEmail: string;
-  orderItemDTOS: {
-    foodName: string;
-    quantity: number;
-    price: number;
-    customIngredients: {
-      ingredientId?: number;
-      ingredientName: string;
-      extraCost: number;
-      quantity: number;
-    }[];
-  }[];
+  guestToken: string;
+
+  orderItemDTOS: GuestOrderItemDTO[];
+
   specialInstructions: string;
   totalAmount: number;
+
+  subtotal?: number;
+  tax?: number;
+  deliveryFee?: number;
 }
+
 
   export interface GuestOrderRequest {
     guestEmail: string;

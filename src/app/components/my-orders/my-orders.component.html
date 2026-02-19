@@ -22,7 +22,6 @@
     <p><strong>Customer:</strong> {{ order.userName }} ({{ order.email }})</p>
   </div>
 
- <!-- Order Items Details -->
 <!-- Order Items Details -->
 <div class="order-items" *ngIf="order.orderItems && order.orderItems.length > 0">
   <h4>Order Details:</h4>
@@ -31,15 +30,18 @@
     <!-- Item Header with name, quantity, and price -->
     <div class="item-header">
       <div class="item-name-quantity">
-        <span class="item-name">{{ item.foodName }}:</span>
+        <span class="item-name">{{ item.foodName || item. drinkName}}:</span>
         <span class="item-quantity">x{{ item.quantity }}</span>
       </div>
-      <!-- <div class="item-price">{{ item.price | currency }}</div> -->
+
     </div>
     
-    <!-- Custom Ingredients -->
     <div *ngIf="item.customIngredients && item.customIngredients.length > 0" class="custom-ingredients">
       <strong>Add Ons:</strong>
+
+       <div *ngIf="item.specialInstructions" class=details>
+                 <h4>Notes: </h4> <small><em>{{ item.specialInstructions }}</em></small>
+              </div>
       <div *ngFor="let ingredient of item.customIngredients" class="ingredient">
         + {{ ingredient.ingredientName }} 
         <span *ngIf="ingredient.quantity > 1">(x{{ ingredient.quantity }})</span>
@@ -89,11 +91,3 @@
   <p><strong>Status:</strong> {{ trackedOrder.status }}</p>
   <p><strong>Total:</strong> {{ trackedOrder.totalPrice | currency }}</p>
 </div>
-
-<!-- Debug Section (optional) -->
-<!-- <div *ngIf="myOrders.length > 0" class="debug-section">
-  <button (click)="showDebug = !showDebug" class="debug-btn">
-    {{ showDebug ? 'Hide' : 'Show' }} Data Structure
-  </button>
-  <pre *ngIf="showDebug">{{ myOrders[0] | json }}</pre>
-</div> -->

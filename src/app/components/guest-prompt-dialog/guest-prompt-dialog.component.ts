@@ -1,12 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
 import { AuthFlowService } from '../../services/auth-flow.service';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +14,9 @@ import { CartService } from '../../services/cart.service';
 import { PaymentComponent } from '../payment/payment.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialogComponent } from '../forgot-password-dialog/forgot-password-dialog.component';
+import { GuestAuthService } from '../../services/guest-auth.service';
+import { GuestPaymentRequest } from '../../shared/models/order.model';
+import { RegisterPageComponent } from '../register-page/register-page.component';
 
 @Component({
   selector: 'app-guest-prompt-dialog',
@@ -42,11 +43,15 @@ export class GuestPromptDialogComponent {
     cartItems: CartItem[] = []; 
 
   constructor(private dialogRef: MatDialogRef<GuestPromptDialogComponent>, 
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     public authFlow: AuthFlowService,
     private router: Router,
     private orderService: OrderService, 
     private dialog: MatDialog, 
-    private cartService: CartService){}
+    private cartService: CartService,
+    private guestAuthService:GuestAuthService){
+  console.log('🔧 GuestPromptDialogComponent initialized');
+  console.log('📋 Data passed to dialog:', data);}
 
     private mapIngredients(ingredients: any[]): any[] {
       return ingredients.map(ing => ({
@@ -56,14 +61,12 @@ export class GuestPromptDialogComponent {
       }));
     }
 
-  
-
   continueAsGuest(): void {
     console.log('continueAsGuest() triggered'); 
     this.guestMode = true;
     this.loginMode = false;
     this.errorMessage = null;
-    console.log('New state:', { // Debug 2
+    console.log('New state:', {
       guestMode: this.guestMode, 
       loginMode: this.loginMode
     });
@@ -73,6 +76,22 @@ export class GuestPromptDialogComponent {
       this.errorMessage = 'Please provide name and email';
       return;
     }
+    if (!this.validateEmail(this.email)) {
+    this.errorMessage = 'Please enter a valid email address';
+    return;
+  }
+
+    if (this.data?.mode === 'viewOrders') {
+    sessionStorage.setItem('guestEmail', this.email);
+    sessionStorage.setItem('guestUserName', this.userName);
+
+    this.dialogRef.close({
+      userName: this.userName,
+      email: this.email,
+      type: 'guestLogin'
+    });
+    return;
+  }
   
     const cartItems = this.cartService.getCartItems();
     if (!cartItems || cartItems.length === 0) {
@@ -83,32 +102,53 @@ export class GuestPromptDialogComponent {
 
     this.isLoading = true;
     this.errorMessage = null;
+
+    const guestToken = this.guestAuthService.getGuestToken();
+       console.log('🔑 Using guestToken:', guestToken);  
     
 
 
-    // Calculate total using service
     const totalAmount = this.cartService.calculateOrderTotalWithTax(cartItems);
-    const subtotal = this.cartService.getCartTotal(); // includes base price + add-ons
+    const subtotal = this.cartService.getCartTotal(); 
     const tax = this.cartService.calculateTax()
   
-    const guestOrderPayload = {
+    const guestOrderPayload: GuestPaymentRequest = {
       guestName: this.userName,
       guestEmail: this.email,
-      orderItemDTOS: cartItems.map(item => ({
-        foodName: item.food.name,
-        quantity: item.quantity,
-        price: this.cartService.calculateItemTotal(item),
-        
-        customIngredients: item.ingredients
-            ?.filter(ing => ing.id != null)
-            .map(ing => ({
-              ingredientId: ing.id,
-              ingredientName: ing.name,
-              extraCost: ing.extraCost,
-              quantity: 1
-            })) || []
-            
-      })),
+      guestToken: guestToken,
+     orderItemDTOS: cartItems.map(item => {
+  if (item.itemType === 'FOOD' && item.food) {
+    return {
+      itemType: 'FOOD' as const,
+      foodId: item.food!.id,
+      foodName: item.food!.name,
+      quantity: item.quantity,
+      price: Number(this.cartService.calculateItemTotal(item)),
+
+      customIngredients: this.mapIngredients(item.ingredients ?? [])
+    };
+  }
+
+   const sizeValue = item.size || 'MEDIUM';
+   const iceOptionValue = item.iceOption || 'WITH_ICE';    
+          
+
+  if (item.itemType === 'DRINK' && item.drink) {
+    return {
+      itemType: 'DRINK' as const,
+      drinkId: item.drink.id,
+      drinkName: item.drink.name,
+      quantity: item.quantity,
+      size: sizeValue,
+      iceOption: iceOptionValue,
+      price: this.cartService.calculateItemTotal(item),
+      customIngredients: []
+    };
+  }
+
+  throw new Error('Invalid cart item');
+}),
+
       
       specialInstructions: '', 
       subtotal: subtotal,
@@ -117,7 +157,6 @@ export class GuestPromptDialogComponent {
       totalAmount: totalAmount
       
     };
-
 
   this.totalAmount = guestOrderPayload.totalAmount;
 
@@ -136,7 +175,9 @@ export class GuestPromptDialogComponent {
           guestName: this.userName,         
           guestEmail: this.email,           
           specialInstructions: '',   
-          guestOrder: guestOrderPayload
+          guestOrder: guestOrderPayload,
+          guestToken: guestToken,
+          paymentAlreadyInitiated: true
         }
       });
 
@@ -152,6 +193,11 @@ export class GuestPromptDialogComponent {
       }
     });
   }
+
+  validateEmail(email: string): boolean {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+}
 
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
@@ -197,7 +243,6 @@ export class GuestPromptDialogComponent {
       return;
     }
   
-    // Use dialog approach (same as LoginPageComponent)
     const dialogRef = this.dialog.open(ForgotPasswordDialogComponent, {
       width: '400px',
       data: { email: this.loginEmail }
@@ -205,7 +250,6 @@ export class GuestPromptDialogComponent {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'success') {
-        // Show success message in the dialog itself
         this.errorMessage = null;
       } else if (result === 'error') {
         this.errorMessage = 'Failed to send reset email';
@@ -219,13 +263,43 @@ export class GuestPromptDialogComponent {
   cancelLogin(): void {
     this.loginMode = false;
     this.errorMessage = null;
+    this.loginEmail = '';
+    this.loginPassword = '';
+    this.hidePassword = true;
   }
 
   goToRegister(): void {
     this.dialogRef.close({ action: 'register' });
-    this.router.navigate(['/register']);
+     const dialogRef = this.dialog.open(RegisterPageComponent, {
+    width: '500px',
+    maxWidth: '95vw',
+    disableClose:false,
+    data: { 
+      fromCheckout: true 
+    }
+  });
+  this.dialogRef.close();
+  
+  dialogRef.afterClosed().subscribe(result => {
+    console.log('Register dialog closed with result:', result);
+    if (result?.action === 'backToCheckout') {
+      this.openCheckoutDialog();
+    }
+  });
   }
 
+
+private openCheckoutDialog(): void {
+  this.dialog.open(GuestPromptDialogComponent, {
+    width: '450px',
+    maxWidth: '95vw',
+    panelClass: 'guest-prompt-dialog-panel',
+    disableClose: false,
+    data: { 
+      fromCheckout: true
+    }
+  });
+}
   logout(): void {
     sessionStorage.removeItem('guestEmail');
     sessionStorage.removeItem('email');
@@ -233,5 +307,7 @@ export class GuestPromptDialogComponent {
   closeCheckout(): void {
     this.dialogRef.close();
   }
-  
+    isViewOrdersMode(): boolean {
+    return this.data?.mode === 'viewOrders';
+  }
 }

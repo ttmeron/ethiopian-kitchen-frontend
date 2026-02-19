@@ -1,4 +1,6 @@
-<div class="register-container">
+<div class="register-container" [class.dialog-mode]="isDialogMode" [class.page-mode]="!isDialogMode">
+
+  <div class="c1">
   <h2>Create Account</h2>
   
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
@@ -139,5 +141,13 @@
     <div class="login-link">
       <p>Already have an account? <a routerLink="/login">Sign in</a></p>
     </div>
+    <div class="back-link" *ngIf="showBackToCheckout()">
+    <a (click)="navigateToCheckoutOptions()">Back to checkout options</a>
+  </div>
+
+
+    
   </form>
+  </div>
+
 </div>

@@ -15,6 +15,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FoodResponse, Ingredient } from '../../shared/models/food-response.model';
 import { AdminFoodService, FoodRequest } from '../../services/admin-food.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+
+
+
 import { Overlay } from '@angular/cdk/overlay';
 @Component({
   selector: 'app-admin-food-management',
@@ -48,14 +51,17 @@ import { Overlay } from '@angular/cdk/overlay';
     }
   ]
 })
+
+
 export class AdminFoodManagementComponent implements OnInit{
   foods: FoodResponse[] = [];
   ingredients: Ingredient[] = [];
   selectedTab = 0;
 
   defaultImage = 'assets/default-food.png';
+  foodForm!: FormGroup;
 
-  foodForm: FormGroup;
+
 
   isEditingFood = false;
   selectedFood: FoodResponse | null = null;
@@ -77,16 +83,22 @@ export class AdminFoodManagementComponent implements OnInit{
 
   selectedIngredients: Ingredient[] = []; // Fixed: Use Ingredient type instead of any[]
 
+  
   constructor(
     private adminService: AdminFoodService,
     private fb: FormBuilder,
     private dialog: MatDialog
   ) {
-    this.foodForm = this.createFoodForm();
-    this.ingredientForm = this.createIngredientForm();
+    this.ingredientForm = this.fb.group({
+    ingredients: this.fb.array([
+      this.createIngredientGroup()
+    ])
+  });
   }
 
   ngOnInit(): void {
+
+     this.foodForm = this.createFoodForm();
     this.loadFoods();
     this.loadIngredients();
 
@@ -98,6 +110,24 @@ export class AdminFoodManagementComponent implements OnInit{
     }, 0);
   }
 
+  onIngredientDropdownChange(selectedId: number, index: number): void {
+  const ingredient = this.ingredients.find(ing => ing.id === selectedId);
+  if (!ingredient) return;
+
+  // Update form array
+  const ingForm = this.ingredientsArray.at(index) as FormGroup;
+  ingForm.patchValue({
+    name: ingredient.id,
+    extraCost: ingredient.extraCost ?? 0
+  });
+
+  // Update selectedIngredients array
+  if (!this.selectedIngredients.some(ing => ing.id === ingredient.id)) {
+    this.selectedIngredients.push({ ...ingredient });
+  }
+}
+
+
   createFoodForm(): FormGroup {
     return this.fb.group({
       name: ['', Validators.required],
@@ -108,6 +138,17 @@ export class AdminFoodManagementComponent implements OnInit{
       ingredients: this.fb.array([])
     });
   }
+
+  createIngredientGroup(): FormGroup {
+  return this.fb.group({
+    id: ['', Validators.required], 
+    name: ['', Validators.required],
+    price: [0, [Validators.required, Validators.min(0)]],
+    extraCost: [0, [Validators.min(0)]],
+    category: [''],
+    isAvailable: [true]
+  });
+}
 
   createIngredientForm(): FormGroup {
     return this.fb.group({
@@ -123,17 +164,23 @@ export class AdminFoodManagementComponent implements OnInit{
     return this.foodForm.get('ingredients') as FormArray;
   }
 
-  addIngredientToFood(ingredientId?: number, extraCost?: number): void {
-    const ingredientGroup = this.fb.group({
-      id: [ingredientId || '', Validators.required],
-      extraCost: [extraCost || 0, [Validators.required, Validators.min(0)]]
-    });
-    this.ingredientsArray.push(ingredientGroup);
-  }
+  addIngredientField(): void {
+  this.ingredientsArray.push(this.createIngredientGroup());
+}
+  removeIngredientField(index: number): void {
+  this.ingredientsArray.removeAt(index);
+}
 
-  removeIngredientFromFood(index: number): void {
-    this.ingredientsArray.removeAt(index);
-  }
+  addIngredientToFood(id: number,name: string = '', extraCost: number = 0): void {
+  this.ingredientsArray.push(this.fb.group({
+    id: [id, Validators.required],  
+    name: [name, Validators.required],
+    extraCost: [extraCost, [Validators.required, Validators.min(0)]]
+  }));
+}
+  removeIngredientFromFood(index: number) {
+  this.ingredientsArray.removeAt(index);
+}
 
   loadFoods(): void {
     this.adminService.getFoods().subscribe({
@@ -222,21 +269,20 @@ export class AdminFoodManagementComponent implements OnInit{
     this.ingredientsArray.clear();
     this.selectedFile = null;
     this.imagePreview = null;
-    this.selectedIngredients = []; // Clear selected ingredients
+    this.selectedIngredients = []; 
   }
 
   editFood(food: FoodResponse): void {
     this.isEditingFood = true;
     this.selectedFood = food;
     
-    // Clear existing ingredients
     this.ingredientsArray.clear();
-    this.selectedIngredients = []; // Clear selected ingredients
+    this.selectedIngredients = [];
     
     // Add ingredients from the food to both form array and selected ingredients
     if (food.ingredients) {
       food.ingredients.forEach(ing => {
-        this.addIngredientToFood(ing.id, ing.extraCost);
+        this.addIngredientToFood(ing.id,ing.name, ing.extraCost);
         this.selectedIngredients.push({
           id: ing.id,
           name: ing.name,
@@ -261,11 +307,67 @@ export class AdminFoodManagementComponent implements OnInit{
     }
   }
 
+   resetForm(): void {
+    this.foodForm.reset();
+    this.ingredientsArray.clear();
+    this.isEditingFood = false;
+    this.selectedFood = null;
+    this.imagePreview = null;
+  }
+
   submitFood(): void {
+
+      console.log('=== FORM VALIDATION DEBUG ===');
+      console.log('Form Valid:', this.foodForm.valid);
+      console.log('Form Invalid:', this.foodForm.invalid);
+      console.log('Form Values:', this.foodForm.value);
+      console.log('Form Errors:', this.foodForm.errors);
+
+      Object.keys(this.foodForm.controls).forEach(key => {
+        const control = this.foodForm.get(key);
+        if (control) {
+          console.log(`Control "${key}":`);
+          console.log('  Value:', control.value);
+          console.log('  Valid:', control.valid);
+          console.log('  Invalid:', control.invalid);
+          console.log('  Errors:', control.errors);
+          console.log('  Touched:', control.touched);
+          console.log('  Dirty:', control.dirty);
+        }
+      });
+
+      const ingredientsArray = this.ingredientsArray;
+        console.log('Ingredients Array length:', ingredientsArray.length);
+        console.log('Ingredients Array valid:', ingredientsArray.valid);
+  
     if (this.foodForm.invalid) {
+    console.log('❌ Form is invalid. Showing validation errors:');
+    
+    this.showValidationErrors();
+    
+    this.foodForm.markAllAsTouched();
+    return;
+
+    
+  }
+
+  console.log('✅ Form is valid, proceeding...');
+  
+    if (this.foodForm.invalid) {
+
       console.log('Form is invalid');
+      this.foodForm.markAllAsTouched();
       return;
     }
+
+    console.log('🚀 Starting food update...');
+
+      const ingredients = this.selectedIngredients.map(ing => ({
+          id: ing.id,
+          extraCost: ing.extraCost || 0
+        }));
+
+        console.log('🧪 Selected ingredients:', ingredients);
   
     const foodData: FoodRequest = {
       name: this.foodForm.value.name,
@@ -273,10 +375,7 @@ export class AdminFoodManagementComponent implements OnInit{
       price: this.foodForm.value.price,
       category: this.foodForm.value.category,
       imagePath: this.foodForm.value.imagePath,
-      ingredients: this.selectedIngredients.map(ing => ({
-        id: ing.id,
-        extraCost: ing.extraCost
-      }))
+      ingredients: ingredients
     };
   
     console.log('Submitting food data:', foodData);
@@ -299,14 +398,40 @@ export class AdminFoodManagementComponent implements OnInit{
     };
   
     if (this.isEditingFood && this.selectedFood?.id) {
-      this.adminService.updateFood(this.selectedFood.id, foodData, this.selectedFile ?? undefined).subscribe({
+    console.log('✏️ Updating existing food ID:', this.selectedFood.id);
+    
+      this.adminService.updateFood(this.selectedFood.id, foodData, this.selectedFile || undefined)
+      .subscribe({
         next: (response) => {
-          console.log('Food updated successfully:', response);
+          console.log('✅ Food updated successfully:', response);
           this.loadFoods();
           this.resetFoodForm();
           alert('Food updated successfully!');
         },
-        error: (error) => handleError(error, 'updating')
+        error: (error) => {
+          console.error('❌ Update failed:', error);
+          
+          // Detailed error info
+          if (error.status) {
+            console.log('Status:', error.status);
+          }
+          if (error.error) {
+            console.log('Error response:', error.error);
+          }
+          if (error.message) {
+            console.log('Message:', error.message);
+          }
+          
+          if (error.status === 403) {
+            alert('Access denied. You need admin privileges.');
+          } else if (error.status === 400) {
+            alert('Invalid data format: ' + (error.error?.message || 'Check your input'));
+          } else if (error.status === 500) {
+            alert('Server error: ' + (error.error?.message || 'Internal server error'));
+          } else {
+            alert('Error: ' + error.message);
+          }
+        }
       });
     } else {
       this.adminService.createFood(foodData, this.selectedFile ?? undefined).subscribe({
@@ -319,40 +444,75 @@ export class AdminFoodManagementComponent implements OnInit{
         error: (error) => handleError(error, 'creating')
       });
     }
+    
   }
 
-  deleteFood(food: FoodResponse): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {
-        title: 'Delete Food',
-        message: `Are you sure you want to delete ${food.name}?`
-      }
-    });
   
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && food.id) {
-        this.adminService.deleteFood(food.id).subscribe({
-          next: () => {
-            this.loadFoods();
-            alert('Food deleted successfully!');
-          },
-          error: (error) => {
-            console.error('Error deleting food:', error);
-            
-            if (error.status === 403) {
-              alert('Access denied. You need admin privileges to delete foods.');
-            } else if (error.status === 401) {
-              alert('Please login to perform this action.');
-            } else if (error.status === 404) {
-              alert('Food not found. It may have been already deleted.');
-            } else {
-              alert('Error deleting food. Please check the console for details.');
-            }
-          }
-        });
-      }
-    });
+
+  deleteFood(foodId: number): void {
+  const food = this.foods.find(f => f.id === foodId);
+  if (!food) return;
+
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      title: 'Delete Food',
+      message: `Are you sure you want to delete ${food.name}?`
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.adminService.deleteFood(foodId).subscribe({
+        next: () => {
+          this.loadFoods();
+          alert('Food deleted successfully!');
+        },
+        error: (error) => {
+          console.error('Error deleting food:', error);
+        }
+      });
+    }
+  });
+}
+
+private showValidationErrors(): void {
+  const errors: string[] = [];
+  
+  // Check each field
+  const nameCtrl = this.foodForm.get('name');
+  if (nameCtrl?.hasError('required')) {
+    errors.push('• Food Name is required');
   }
+  if (nameCtrl?.hasError('minlength')) {
+    errors.push(`• Food Name must be at least ${nameCtrl.errors?.['minlength']?.requiredLength} characters`);
+  }
+  
+  const descCtrl = this.foodForm.get('description');
+  if (descCtrl?.hasError('required')) {
+    errors.push('• Description is required');
+  }
+  if (descCtrl?.hasError('minlength')) {
+    errors.push(`• Description must be at least ${descCtrl.errors?.['minlength']?.requiredLength} characters`);
+  }
+  
+  const priceCtrl = this.foodForm.get('price');
+  if (priceCtrl?.hasError('required')) {
+    errors.push('• Price is required');
+  }
+  if (priceCtrl?.hasError('min')) {
+    errors.push(`• Price must be at least ${priceCtrl.errors?.['min']?.min}`);
+  }
+  
+  const categoryCtrl = this.foodForm.get('category');
+  if (categoryCtrl?.hasError('required')) {
+    errors.push('• Category is required');
+  }
+  
+  // Show errors in alert
+  if (errors.length > 0) {
+    alert('Please fix the following errors:\n\n' + errors.join('\n'));
+  }}
+
 
   resetFoodForm(): void {
     this.foodForm.reset();
@@ -376,37 +536,30 @@ export class AdminFoodManagementComponent implements OnInit{
     return ingredient ? ingredient.name : 'Unknown Ingredient';
   }
 
-  // FIXED: Use Ingredient type instead of ComponentIngredient
-  addIngredient(ingredient: Ingredient) {
-    if (!this.selectedIngredients.some(ing => ing.id === ingredient.id)) {
-      this.selectedIngredients.push({
-        id: ingredient.id,
-        name: ingredient.name,
-        price: ingredient.price,
-        extraCost: ingredient.extraCost,
-        category: ingredient.category,
-        isAvailable: ingredient.isAvailable
-      });
-    }
-  }
+  addIngredient(): void {
+  const ingredientGroup = this.fb.group({
+    name: ['', Validators.required],
+    extraCost: [0, [Validators.min(0)]]
+  });
+  this.ingredientsArray.push(ingredientGroup);
+}
 
   getIngredientPrice(ingredientId: number): number {
     const ingredient = this.ingredients.find(ing => ing.id === ingredientId);
     return ingredient ? ingredient.extraCost : 0;
   }
 
-  // FIXED: All ingredient methods now use number IDs consistently
-  removeIngredient(index: number) {
-    this.selectedIngredients.splice(index, 1);
-  }
+  removeIngredient(index: number): void {
+  this.ingredientsArray.removeAt(index);
+}
 
-  removeIngredientById(ingredientId: number) { // Changed to number
+  removeIngredientById(ingredientId: number) { 
     this.selectedIngredients = this.selectedIngredients.filter(
       ing => ing.id !== ingredientId
     );
   }
 
-  isIngredientSelected(ingredientId: number): boolean { // Changed to number
+  isIngredientSelected(ingredientId: number): boolean { 
     return this.selectedIngredients.some(ing => ing.id === ingredientId);
   }
 
@@ -511,3 +664,5 @@ export class AdminFoodManagementComponent implements OnInit{
     this.selectedIngredient = null;
   }
 }
+
+

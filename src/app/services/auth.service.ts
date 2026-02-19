@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable , throwError} from 'rxjs';
 import { tap,catchError } from 'rxjs/operators';
 import { GuestAuthService } from './guest-auth.service';
 import { AuthUser, GuestUser, RegularUser } from '../shared/models/auth-types';
-import { BaseUser, UserRole } from '../shared/user-roles.model';
+import { UserRole } from '../shared/user-roles.model';
 import { JwtHelperService } from './jwt-helper.service';
 @Injectable({
   providedIn: 'root',
@@ -42,7 +42,6 @@ export class AuthService {
       return this.isUserLoggedIn(); 
     }
 
- // auth.service.ts
  getUser(): { userName: string, email: string } | null {
     const user = this.getCurrentUser();
     
@@ -85,23 +84,21 @@ export class AuthService {
       console.log('🔍 isAdmin() check - userRole:', userRole, 'UserRole.ADMIN:', UserRole.ADMIN);
       console.log('🔍 Comparison result:', userRole === UserRole.ADMIN);
       
-      // Case-insensitive comparison
       return userRole?.toUpperCase() === UserRole.ADMIN.toUpperCase();
     }
-    // In your auth.service.ts - update getCurrentUser method
+
+    
 getCurrentUser(): AuthUser {
   const regularUser = this.getRegularUser();
   if (regularUser) {
-    // Get role from sessionStorage, or extract from token if not found
     let role = sessionStorage.getItem('userRole') as UserRole;
     
     if (!role) {
-      // If no role in sessionStorage, try to extract from token
       const token = this.getToken();
       if (token) {
         role = this.jwtHelper.getRoleFromToken(token) as UserRole;
         if (role) {
-          sessionStorage.setItem('userRole', role); // Cache it for future use
+          sessionStorage.setItem('userRole', role); 
         }
       }
     }
@@ -162,13 +159,17 @@ getCurrentUser(): AuthUser {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((response) => {
 
+       if (response.token) {
+        sessionStorage.setItem('token', response.token);
+        sessionStorage.setItem('email', response.email);
+        sessionStorage.setItem('userName', response.userName);
+      }
          console.log('🔍 FULL LOGIN RESPONSE FROM BACKEND:', response);
           const roleFromToken = this.jwtHelper.getRoleFromToken(response.token);
           console.log('🔍 Role extracted from JWT token:', roleFromToken)
          
       
         this.saveToken(response.token);
-        //  const role = (response as any).role || UserRole.USER;
         this.saveUser(response.userName, response.email, roleFromToken || undefined);
         this.authState.next(true);
         this.currentUserSubject.next(this.getCurrentUser());
@@ -221,19 +222,31 @@ getCurrentUser(): AuthUser {
 
       
   saveUser(userName: string, email: string, role?: string) {
+  console.log('💾 saveUser called with:', { userName, email, role });
+  
   sessionStorage.setItem('userName', userName);
   sessionStorage.setItem('email', email);
   
-  // If no role provided, try to determine it
-   if (role) {
-      sessionStorage.setItem('userRole', role);
-      console.log('💾 Saved to sessionStorage - role:', role);
-    } else {
-      // If no role provided, remove any existing role to avoid conflicts
-      sessionStorage.removeItem('userRole');
-      console.log('💾 No role provided, cleared userRole from sessionStorage');
+  if (role) {
+    sessionStorage.setItem('userRole', role);
+    console.log('💾 Role saved to sessionStorage:', role);
+  } else {
+    const token = this.getToken();
+    if (token) {
+      const extractedRole = this.jwtHelper.getRoleFromToken(token);
+      if (extractedRole) {
+        sessionStorage.setItem('userRole', extractedRole);
+        console.log('💾 Role extracted from token and saved:', extractedRole);
+      }
     }
   }
+
+   setTimeout(() => {
+    this.currentUserSubject.next(this.getCurrentUser());
+    console.log('🔄 Current user subject updated');
+  }, 100);
+  }
+
   getAuthState(): Observable<boolean> {
     return this.authState.asObservable();
   }
@@ -248,16 +261,13 @@ getCurrentUser(): AuthUser {
     
     const rawMessage = error.error?.message || error.message || '';
     
-    // Extract text between quotes or after the status code
     let cleanMessage = '';
     
     if (typeof rawMessage === 'string') {
-      // Method 1: Extract text between quotes
       const quotedText = rawMessage.match(/"([^"]*)"/);
       if (quotedText && quotedText[1]) {
         cleanMessage = quotedText[1];
       } else {
-        // Method 2: Split by space and take parts after status code
         const parts = rawMessage.split(/\s+/);
         if (parts.length > 2) {
           cleanMessage = parts.slice(2).join(' ').replace(/^"|"$/g, '');
@@ -265,7 +275,6 @@ getCurrentUser(): AuthUser {
       }
     }
     
-    // Use status-based fallbacks
     if (!cleanMessage) {
       if (error.status === 404) {
         cleanMessage = 'No account found with this email address.';

@@ -1,0 +1,229 @@
+<div class="form-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="mb-0">{{ isEditMode ? 'Edit Employee' : 'Add New Employee' }}</h4>
+          </div>
+          <div class="card-body">
+            <!-- Loading Spinner -->
+            @if (isLoading) {
+              <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading employee data...</p>
+              </div>
+            }
+
+            <!-- Employee Form -->
+            @if (!isLoading) {
+              <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
+                <div class="row g-3">
+                  <!-- First Name -->
+                  <div class="col-md-6">
+                    <label for="firstName" class="form-label">First Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="firstName" formControlName="firstName"
+                           [class.is-invalid]="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
+                           placeholder="Enter first name">
+                    @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
+                      <div class="invalid-feedback">
+                        @if (firstName?.errors?.['required']) {
+                          <div>First name is required</div>
+                        }
+                        @if (firstName?.errors?.['minlength']) {
+                          <div>First name must be at least 2 characters</div>
+                        }
+                        @if (firstName?.errors?.['maxlength']) {
+                          <div>First name cannot exceed 50 characters</div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Last Name -->
+                  <div class="col-md-6">
+                    <label for="lastName" class="form-label">Last Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="lastName" formControlName="lastName"
+                           [class.is-invalid]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+                           placeholder="Enter last name">
+                    @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
+                      <div class="invalid-feedback">
+                        @if (lastName?.errors?.['required']) {
+                          <div>Last name is required</div>
+                        }
+                        @if (lastName?.errors?.['minlength']) {
+                          <div>Last name must be at least 2 characters</div>
+                        }
+                        @if (lastName?.errors?.['maxlength']) {
+                          <div>Last name cannot exceed 50 characters</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                      <label for="dateOfBirth" class="form-label">Date of Birth <span class="required">*</span></label>
+                      <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth"
+                            [class.is-invalid]="dateOfBirth?.invalid && (dateOfBirth?.dirty || dateOfBirth?.touched)">
+                      @if (dateOfBirth?.invalid && (dateOfBirth?.dirty || dateOfBirth?.touched)) {
+                        <div class="invalid-feedback">
+                          Date of birth is required
+                        </div>
+                      }
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Email <span class="required">*</span></label>
+                    <input type="email" class="form-control" id="email" formControlName="email"
+                           [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)"
+                           placeholder="Enter email address">
+                    @if (email?.invalid && (email?.dirty || email?.touched)) {
+                      <div class="invalid-feedback">
+                        @if (email?.errors?.['required']) {
+                          <div>Email is required</div>
+                        }
+                        @if (email?.errors?.['email']) {
+                          <div>Please enter a valid email address</div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Phone Number -->
+                  <div class="col-md-6">
+                    <label for="phoneNumber" class="form-label">Phone Number <span class="required">*</span></label>
+                    <input type="tel" class="form-control" id="phoneNumber" formControlName="phoneNumber"
+                           [class.is-invalid]="phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)"
+                           placeholder="Enter phone number">
+                    @if (phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)) {
+                      <div class="invalid-feedback">
+                        @if (phoneNumber?.errors?.['required']) {
+                          <div>Phone number is required</div>
+                        }
+                        @if (phoneNumber?.errors?.['pattern']) {
+                          <div>Please enter a valid phone number (10-15 digits)</div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Position -->
+                  <div class="col-md-6">
+                    <label for="position" class="form-label">Position <span class="required">*</span></label>
+                    <select class="form-select" id="position" formControlName="position" (change)="onPositionChange()"
+                            [class.is-invalid]="position?.invalid && (position?.dirty || position?.touched)">
+                      <option value="">Select Position</option>
+                      @for (position of positions; track position) {
+                        <option [value]="position">{{position | titlecase}}</option>
+                      }
+                    </select>
+                    @if (position?.invalid && (position?.dirty || position?.touched)) {
+                      <div class="invalid-feedback">
+                        Position is required
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Department -->
+                  <div class="col-md-6">
+                    <label for="department" class="form-label">Department</label>
+                    <select class="form-select" id="department" formControlName="department">
+                      <option value="">Select Department</option>
+                      @for (dept of departments; track dept) {
+                        <option [value]="dept">{{dept | titlecase}}</option>
+                      }
+                    </select>
+                    <small class="form-text text-muted">Auto-filled based on position</small>
+                  </div>
+
+                  <!-- Hire Date -->
+                  <div class="col-md-6">
+                    <label for="hireDate" class="form-label">Hire Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="hireDate" formControlName="hireDate"
+                           [class.is-invalid]="hireDate?.invalid && (hireDate?.dirty || hireDate?.touched)">
+                    @if (hireDate?.invalid && (hireDate?.dirty || hireDate?.touched)) {
+                      <div class="invalid-feedback">
+                        Hire date is required
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Salary -->
+                  <div class="col-md-6">
+                    <label for="salary" class="form-label">Salary <span class="required">*</span></label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="number" class="form-control" id="salary" formControlName="salary" 
+                             min="0" step="0.01" placeholder="0.00"
+                             [class.is-invalid]="salary?.invalid && (salary?.dirty || salary?.touched)">
+                    </div>
+                    @if (salary?.invalid && (salary?.dirty || salary?.touched)) {
+                      <div class="invalid-feedback d-block">
+                        @if (salary?.errors?.['required']) {
+                          <div>Salary is required</div>
+                        }
+                        @if (salary?.errors?.['min']) {
+                          <div>Salary must be positive</div>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Shift -->
+                  <div class="col-md-6">
+                    <label for="shift" class="form-label">Shift <span class="required">*</span></label>
+                    <select class="form-select" id="shift" formControlName="shift"
+                            [class.is-invalid]="shift?.invalid && (shift?.dirty || shift?.touched)">
+                      <option value="">Select Shift</option>
+                      @for (shift of shifts; track shift) {
+                        <option [value]="shift">{{shift | titlecase}}</option>
+                      }
+                    </select>
+                    @if (shift?.invalid && (shift?.dirty || shift?.touched)) {
+                      <div class="invalid-feedback">
+                        Shift is required
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Emergency Contact -->
+                  <div class="col-md-6">
+                    <label for="emergencyContact" class="form-label">Emergency Contact</label>
+                    <input type="text" class="form-control" id="emergencyContact" formControlName="emergencyContact"
+                           placeholder="Enter emergency contact">
+                  </div>
+
+                  <!-- Address -->
+                  <div class="col-12">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" formControlName="address" 
+                              rows="3" placeholder="Enter full address"></textarea>
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions mt-4 pt-3 border-top">
+                  <button type="submit" class="btn btn-primary btn-lg me-3" [disabled]="isSubmitting">
+                    @if (isSubmitting) {
+                      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                      {{ isEditMode ? 'Updating...' : 'Creating...' }}
+                    } @else {
+                      <i class="fas fa-save me-2"></i>
+                      {{ isEditMode ? 'Update Employee' : 'Create Employee' }}
+                    }
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary btn-lg" routerLink="/employees" [disabled]="isSubmitting">
+                    <i class="fas fa-times me-2"></i>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

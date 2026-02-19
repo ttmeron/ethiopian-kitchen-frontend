@@ -1,0 +1,256 @@
+.form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fbfffd 0%, #ced0d0 100%);
+  padding: 2rem 0;
+  padding-top: 100px;
+  animation: fadeIn 0.6s ease-in;
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+  }
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  background: white; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden; 
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+  }
+
+  &-header {
+    background: linear-gradient(135deg, #ce0808,#f94f4fdc 0% 100%);
+    color: white;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.5rem 2rem;
+    border: none;
+    position: relative;
+    z-index: 2;
+
+    h4 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &-body {
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 3rem 0;
+  position: relative;
+  z-index: 2;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 3px;
+  }
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+.employee-form {
+  position: relative;
+  z-index: 2;
+
+  .row.g-3 {
+    margin-bottom: 1rem;
+    
+    > [class*="col-"] {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  display: block;
+  position: relative;
+  z-index: 3;
+  line-height: 1.4;
+
+  .required {
+    color: #e53e3e;
+    font-weight: 700;
+  }
+}
+
+.form-control, .form-select {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fff;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: block;
+
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+    background: #fff;
+    outline: none;
+  }
+
+  &:hover {
+    border-color: #cbd5e0;
+  }
+
+  &.is-invalid {
+    border-color: #e53e3e;
+    background-image: none;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+      border-color: #e53e3e;
+    }
+  }
+
+  &::placeholder {
+    color: #a0aec0;
+    font-size: 0.9rem;
+  }
+}
+
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  background-repeat: no-repeat;
+}
+
+.input-group {
+  position: relative;
+  z-index: 2;
+
+  .input-group-text {
+    background-color: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    font-weight: 600;
+    color: #4a5568;
+    z-index: 2;
+  }
+
+  .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+  }
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  color: #e53e3e;
+  display: block;
+  position: relative;
+  z-index: 2;
+
+  &.d-block {
+    display: block !important;
+  }
+}
+
+.form-text {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.btn {
+  border-radius: 10px;
+  padding: 0.875rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  min-width: 160px;
+  position: relative;
+  z-index: 2;
+
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .employee-form .row.g-3 > [class*="col-"] {
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

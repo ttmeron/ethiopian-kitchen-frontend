@@ -1,11 +1,19 @@
 .menu-container {
-  max-width: 1200px;
+  max-width: 1800px;  
   margin: 0 auto;
-  padding: 20px;
+  margin-top: 30px;
+  padding: 100px 40px;
   font-family: 'Helvetica Neue', Arial, sans-serif;
   color: #333;
+  width: 95%;
+   @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 40px 15px;
+  }
 }
-
 .restaurant-name {
   text-align: center;
   font-size: 2.5rem;
@@ -18,6 +26,7 @@
 .category-filter {
   display: flex;
   justify-content: center;
+  
   gap: 10px;
   margin-bottom: 30px;
   flex-wrap: wrap;
@@ -46,26 +55,49 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: center; // Center items, useful when less than 3
+  justify-content: center; 
 }
 
-app-food-item {
-  flex: 0 0 calc(33.333% - 20px);
-  max-width: calc(33.333% - 20px);
-  transition: transform 0.3s ease, width 0.3s ease;
+.category-separator {
+    width: 85%;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 30px 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #078735; 
+    text-transform: uppercase;
+    color: #078735;
+  }
+
+  .items-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 80%;
+}
+
+.grid-item {
+  flex: 0 0 calc((100% / 3) - (20px * 2 / 3));
+  max-width: calc((100% / 3) - (20px * 2 / 3));
+  transition: transform 0.3s ease;
 
   &:hover {
     transform: scale(1.03);
   }
 
-  // ➤ Tablet fallback (2 per row)
-  @media (max-width: 1024px) {
-    flex: 0 0 calc(50% - 20px);
-    max-width: calc(50% - 20px);
+
+  // ➤ 4 items per row
+  @media (max-width: 1200px) {
+    flex: 0 0 calc((100% / 3) - (20px * 2 / 3));
+    max-width: calc((100% / 3) - (20px * 2 / 3));
   }
 
-  // ➤ Mobile fallback (1 per row)
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
+    flex: 0 0 calc((100% / 2) - (20px * 1 / 2));
+    max-width: calc((100% / 2) - (20px * 1 / 2));
+  }
+
+  @media (max-width: 280px) {
     flex: 0 0 100%;
     max-width: 100%;
   }

@@ -1,8 +1,6 @@
 import { Component, Input, Output,EventEmitter } from '@angular/core';
 import { FoodResponse } from '../../shared/models/food-response.model';
-import { CartService } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
-import { CartItem } from '../../shared/models/cart-item.model';
 import { FoodModalComponent } from '../food-modal/food-modal.component';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -37,9 +35,9 @@ export class FoodItemComponent {
   }
   onCardClick(): void {
     this.dialog.open(FoodModalComponent, {
-      width: '500px',  // or '80%' for responsive width
+      width: '500px',  
       data: { food: this.food },
-      panelClass: 'custom-dialog-container' // optional
+      panelClass: 'custom-dialog-container' 
     });
   }
 }

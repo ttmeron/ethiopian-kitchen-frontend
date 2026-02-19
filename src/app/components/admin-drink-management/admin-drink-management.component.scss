@@ -1,0 +1,120 @@
+
+
+:host {
+  display: block;
+  max-width: 900px;
+  margin: 2rem auto;
+  margin-top: 60px;
+  padding: 2rem 3rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+ h2 {
+    text-align: center;
+    font-weight: 600;
+    color: #333;
+  }
+
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  overflow: visible;
+
+  mat-form-field {
+    width: 100%;
+    margin-top: 40px;
+  }
+
+  mat-checkbox {
+    margin-right: 1.5rem;
+    font-weight: 500;
+    color: #444;
+  }
+
+  input[type='file'] {
+    grid-column: 1 / -1;
+    padding: 0.75rem;
+    border: 1px dashed #ccc;
+    border-radius: 10px;
+    background: #fafafa;
+    cursor: pointer;
+  }
+
+  img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  button[mat-raised-button] {
+    grid-column: 1 / -1;
+    justify-self: flex-end;
+    min-width: 160px;
+    padding: 0.7rem 1.5rem;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #2e7d32;
+    color: #fff;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #256429;
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th {
+  background: #f4f4f4;
+  font-weight: 600;
+  color: #333;
+}
+
+td,
+th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+button[mat-icon-button] {
+  margin-right: 0.4rem;
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1.5rem;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  button[mat-raised-button] {
+    width: 100%;
+  }
+}

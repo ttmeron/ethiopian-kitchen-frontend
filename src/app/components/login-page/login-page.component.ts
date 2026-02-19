@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,14 +27,12 @@ export class LoginPageComponent {
 
   constructor( 
     private authFlow: AuthFlowService,
-    // private passwordResetService: PasswordResetService,
     private authService: AuthService,
     private router: Router,
     private dialog: MatDialog
     ){}
 
     ngOnInit() {
-    // Debug router events
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         console.log('🔄 Navigation START:', event.url);
@@ -51,32 +49,6 @@ export class LoginPageComponent {
     });
   }
 
-
-// async onSubmit(): Promise<void> {
-//     this.isLoading = true;
-//     this.errorMessage = null;
-    
-//     try {
-//       const success = await this.authFlow.login({
-//         email: this.email.toLowerCase().trim(),
-//         password: this.password
-//       });
-
-//       if (success) {
-//         // Check if user is admin and redirect accordingly
-//         if (this.authService.isAdmin()) {
-//           this.router.navigate(['/admin/food-management']); // Direct to food management
-//         } else {
-//           this.router.navigate(['/']); // Regular user to home
-//         }
-//       }
-//     } catch (error: any) {
-//       console.error('Full error:', error);
-//       this.errorMessage = error.message;
-//     } finally {
-//       this.isLoading = false;
-//     }
-//   }
 async onSubmit(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
@@ -92,7 +64,6 @@ async onSubmit(): Promise<void> {
       console.log('🔐 2. Login successful:', success);
       
       if (success) {
-        // ✅ CRITICAL: Check admin status after login
         console.log('🔐 3. Checking admin status...');
         console.log('🔐 4. isAdmin():', this.authService.isAdmin());
         console.log('🔐 5. getUserRole():', this.authService.getUserRole());
@@ -101,7 +72,7 @@ async onSubmit(): Promise<void> {
 
         if (this.authService.isAdmin()) {
           console.log('🎯 8. ADMIN DETECTED - Redirecting to /admin/foods');
-          this.router.navigate(['/admin/food-management']);
+          this.router.navigate(['/admin/foods']);
         } else {
           console.log('👤 9. REGULAR USER - Redirecting to home');
           this.router.navigate(['/']);
@@ -132,9 +103,7 @@ async onSubmit(): Promise<void> {
     
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          // Show success message on login page
           this.errorMessage = null;
-          // You can show a success message here
           console.log('Password reset email sent to:', result);
         }
       });

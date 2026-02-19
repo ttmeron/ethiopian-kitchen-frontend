@@ -1,27 +1,93 @@
-<div class="order-display">
+
+  <div class="order-display">
     <h2>Current Orders</h2>
-    
-    <div class="orders-container">
+
+    <div class="orders-grid" *ngIf="orders && orders.length > 0">
       <div *ngFor="let order of orders" class="order-card">
+
         <div class="order-header">
-          <h3>Order #{{order.orderId}}</h3>
-          <span class="status">{{order.status}}</span>
+          <div class="countdown-timer" [class]="'countdown-timer ' + getTimerColor(order)">
+
+          <h3>Order #{{ getShortOrderNumber(order) }}</h3>
+
+            <div class="timer-circle">
+              <div class="timer-progress" [style.transform]="'rotate(' + (360 - (getTimerProgress(order) * 3.6)) + 'deg)'"></div>
+              <div class="timer-text">
+                {{ getTimerText(order) }}
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="timer" [ngClass]="getTimerColor(order)">
-          {{order.remainingTime}} min
+
+        <div class="order-details">
+          <p><strong>Customer:</strong> {{ order.userName || order.userName || 'Unknown' }}</p>
+          <p><strong>Placed:</strong> {{ order.placedTime | date:'M/d/yy, h:mm a' }}</p>
+          <p><strong>Estimated Ready:</strong> 
+            <span *ngIf="isValidEstimatedTime(order)">
+              {{ order.estimatedReadyTime | date:'M/d/yy, h:mm a' }}
+            </span>
+            <span *ngIf="!isValidEstimatedTime(order)" class="calculating">
+              Calculating...
+            </span>
+          </p>
+          <p><strong>Time Remaining:</strong> {{ getTimerText(order) }}</p>
+          <p><strong>Status:</strong> {{ order.status }}</p>
+          <!-- Debug info -->
+          <p *ngIf="order.placedTime" class="debug-info">
+            <small>Order placed {{ getTimeSincePlaced(order) }}</small>
+          </p>
         </div>
-        
+
+        <!-- Order Items -->
+        <div class="order-items" *ngIf="order.orderItems && order.orderItems.length > 0">
+          <h4>Items:</h4>
+            <div *ngFor="let item of order.orderItems; let i = index" class="item-container">
+
+              <span class="item-name">
+                {{ item.foodName || item.drinkName }}
+
+                <span *ngIf="item.itemType === 'DRINK' && item.size">
+                  ({{ item.size }})
+                </span>
+
+                <span *ngIf="item.itemType === 'DRINK' && item.iceOption">
+                  [{{ item.iceOption }}]
+                </span>
+
+                x{{ item.quantity }}
+              </span>
+
+
+              <div *ngIf="item.specialInstructions" class=details>
+                 <h4>Notes: </h4> <small><em>{{ item.specialInstructions }}</em></small>
+              </div>
+
+            <div *ngIf="item.customIngredients && item.customIngredients.length > 0" class="details">
+              <strong>Add Ons:</strong>
+              <div *ngFor="let ing of item.customIngredients" class="ingredient">
+                + {{ ing.ingredientName }}
+              </div>
+            </div>
+
+            <div *ngIf="!item.customIngredients || item.customIngredients.length === 0" class="no-customizations">
+              No customizations
+            </div>
+          </div>
+      
+
+        <!-- Mark as Ready Button -->
         <button 
-          *ngIf="order.status === OrderStatus.PROCESSING" 
+          *ngIf="order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.PROCESSING" 
           (click)="markAsReady(order)"
           class="ready-btn">
           Mark as Ready
         </button>
+
       </div>
     </div>
-  
-    <div *ngIf="orders.length === 0" class="no-orders">
+
+    <div *ngIf="!orders || orders.length === 0" class="no-orders">
       No orders found
     </div>
   </div>
+</div>
