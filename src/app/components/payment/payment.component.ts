@@ -12,7 +12,6 @@ import { CommonModule} from '@angular/common';
 import {  Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
 
 import { ReactiveFormsModule, FormsModule, } from '@angular/forms';
-import { environment } from '../../environments/environment';
 import { MatSelectModule } from '@angular/material/select';
 import { OrderService } from '../../services/order.service';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +22,7 @@ import { CartService } from '../../services/cart.service';
 import {  MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { GuestAuthService } from '../../services/guest-auth.service';
+import { environment } from '../../../environments/environment';
 
 export interface PaymentDialogData {
   totalAmount: number;
