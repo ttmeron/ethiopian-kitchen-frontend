@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../enviironments/environment';
+import { environment } from '../../environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LoginRequest } from '../shared/models/login-request.model';
 import { AuthResponse } from '../shared/models/auth-response.model';

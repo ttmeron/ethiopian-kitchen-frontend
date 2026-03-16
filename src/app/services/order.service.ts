@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError } from 'rxjs';
 import { CartItem , CreateOrderRequest, OrderItemIngredientRequest, OrderItemRequest } from '../shared/models/cart-item.model';
 import { GuestOrderResponse, GuestPaymentRequest, OrderResponse } from '../shared/models/order.model';
-import { environment } from '../enviironments/environment';
+import { environment } from '../../environments/environment';
 import { ApiAddOn } from '../shared/models/food-response.model';
 import { CartService } from './cart.service';
 import { PaymentDto, PaymentResponse } from '../shared/models/order.model';

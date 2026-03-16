@@ -12,7 +12,7 @@ import { CommonModule} from '@angular/common';
 import {  Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
 
 import { ReactiveFormsModule, FormsModule, } from '@angular/forms';
-import { environment } from '../../enviironments/environment';
+import { environment } from '../../environments/environment';
 import { MatSelectModule } from '@angular/material/select';
 import { OrderService } from '../../services/order.service';
 import { firstValueFrom } from 'rxjs';

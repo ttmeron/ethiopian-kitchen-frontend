@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { BehaviorSubject, Observable, catchError, tap, throwError } from "rxjs";
-import { environment } from "../enviironments/environment";
+import { environment } from "../environments/environment";
 import { GuestUser } from "../shared/models/auth-types";
 import { v4 as uuidv4 } from 'uuid';
 

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, firstValueFrom } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { GuestPromptDialogComponent } from '../components/guest-prompt-dialog/guest-prompt-dialog.component';
-import { environment } from '../enviironments/environment';
+import { environment } from '../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { CartItem } from '../shared/models/cart-item.model';
