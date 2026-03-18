@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CartService } from '../../services/cart.service';
 import { CartItem } from '../../shared/models/cart-item.model';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-food-modal',
@@ -29,6 +30,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class FoodModalComponent {
 
+  private baseUrl = environment.apiUrl;
 
   defaultImage = '/assets/images/food-placeholder.jpg';
   isAddingToCart = false;
@@ -113,7 +115,7 @@ export class FoodModalComponent {
   getImageUrl(): string {
     if (!this.data.food?.imagePath) return this.defaultImage;
     if (this.data.food.imagePath.startsWith('http')) return this.data.food.imagePath;
-    return `http://localhost:8080/api/images/${this.data.food.imagePath}`;
+    return `${this.baseUrl}/images/${this.data.food.imagePath}`;
   }
 
   handleImageError(event: Event): void {

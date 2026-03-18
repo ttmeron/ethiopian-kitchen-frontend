@@ -13,6 +13,7 @@ import { SoftDrink, SoftDrinkService } from '../../services/SoftDrink.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-drink-management',
@@ -51,6 +52,7 @@ iceOptions = [
 ];
 
 
+  private baseUrl = environment.apiUrl
   drinks: SoftDrink[] = [];
   drinkForm!: FormGroup;
 
@@ -207,7 +209,7 @@ initForm() {
     if (!drink.imagePath) return 'assets/default-drink.png';
     return drink.imagePath.startsWith('http')
       ? drink.imagePath
-      : `http://localhost:8080/api/images/${drink.imagePath}`;
+      : `${this.baseUrl}/images/${drink.imagePath}`;
   }
 
 

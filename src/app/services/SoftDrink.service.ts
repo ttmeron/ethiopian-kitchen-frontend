@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Observable, throwError} from "rxjs";
 import { of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from "../../environments/environment";
 
 export interface SoftDrink {
   id: number;
@@ -26,8 +27,9 @@ export interface ApiResponse<T> {
 })
 export class SoftDrinkService {
 
-  private apiUrl = 'http://localhost:8080/api/soft-drinks';
-  private adminUrl = 'http://localhost:8080/api/soft-drinks/admin';
+  private baseUrl = environment.apiUrl;
+  private apiUrl = `${this.baseUrl}/soft-drinks`;
+  private adminUrl =  `${this.baseUrl}/soft-drinks/admin`;
   
   constructor(private http: HttpClient) {}
   

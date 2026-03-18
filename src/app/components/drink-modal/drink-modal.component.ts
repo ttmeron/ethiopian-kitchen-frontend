@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { SoftDrink } from '../../services/SoftDrink.service';
 import { CartService } from '../../services/cart.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-drink-modal',
@@ -30,6 +31,7 @@ import { CartService } from '../../services/cart.service';
 })
 export class DrinkModalComponent implements OnInit{
 
+   private baseUrl = environment.apiUrl;
   drink: any;
   selectedSize: string = 'MEDIUM';
   selectedIceLevel: string = 'NORMAL';
@@ -72,7 +74,7 @@ export class DrinkModalComponent implements OnInit{
   getImageUrl(): string {
     if (!this.drink?.imagePath) return this.defaultImage;
     if (this.drink.imagePath.startsWith('http')) return this.drink.imagePath;
-    return `http://localhost:8080/api/images/${this.drink.imagePath}`;
+    return `${this.baseUrl}/images/${this.drink.imagePath}`;
   }
 
     handleImageError(event: Event): void {

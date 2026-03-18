@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-drink-item',
@@ -10,6 +11,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class DrinkItemComponent {
 
+
+    private baseUrl = environment.apiUrl;
     private _drink: any = {}; 
   @Input() 
     set drink(value: any) {
@@ -30,7 +33,7 @@ export class DrinkItemComponent {
    getImageUrl(): string {
     if (!this.drink?.imagePath) return this.defaultImage;
     if (this.drink.imagePath.startsWith('http')) return this.drink.imagePath;
-    return `http://localhost:8080/api/images/${this.drink.imagePath}`;
+    return `${this.baseUrl}/images/${this.drink.imagePath}`;
   }
 
   handleImageError(event: Event): void {

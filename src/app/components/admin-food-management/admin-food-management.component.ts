@@ -19,6 +19,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 
 
 import { Overlay } from '@angular/cdk/overlay';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-admin-food-management',
   standalone: true,
@@ -58,6 +59,8 @@ export class AdminFoodManagementComponent implements OnInit{
   ingredients: Ingredient[] = [];
   selectedTab = 0;
 
+
+  private baseUrl = environment.apiUrl;
   defaultImage = 'assets/default-food.png';
   foodForm!: FormGroup;
 
@@ -205,7 +208,7 @@ export class AdminFoodManagementComponent implements OnInit{
       return food.imagePath;
     }
 
-    return `http://localhost:8080/api/images/${food.imagePath}`;
+    return `${this.baseUrl}/images/${food.imagePath}`;
   }
 
   getIngredientFormGroup(index: number): FormGroup {

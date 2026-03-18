@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FoodModalComponent } from '../food-modal/food-modal.component';
 
 import { MatDialog } from '@angular/material/dialog';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-food-item',
@@ -18,6 +19,7 @@ export class FoodItemComponent {
   @Output() foodSelected = new EventEmitter<FoodResponse>();
 
 
+   private baseUrl = environment.apiUrl;
   defaultImage = 'assets/default-food.png';
 
   constructor(
@@ -26,7 +28,7 @@ export class FoodItemComponent {
   getImageUrl(): string {
     if (!this.food?.imagePath) return this.defaultImage;
     if (this.food.imagePath.startsWith('http')) return this.food.imagePath;
-    return `http://localhost:8080/api/images/${this.food.imagePath}`;
+    return `${this.baseUrl}/images/${this.food.imagePath}`;
   }
 
   handleImageError(event: Event) {
