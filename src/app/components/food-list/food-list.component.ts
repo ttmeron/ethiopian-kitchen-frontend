@@ -72,7 +72,11 @@ export class FoodListComponent implements OnInit {
       
       let foodItems: MenuItem[] = [];
       if (foods && Array.isArray(foods)) {
-        foodItems = foods.map(food => ({
+         console.log('🍔 Raw foods from API:', JSON.stringify(foods, null, 2));
+  
+        foodItems = foods.map(food => {
+          console.log('Processing food:', food.name, 'category:', food.category);
+          return{
           id: food.id || 0,
           name: food.name || 'Unknown',
           description: food.description,
@@ -84,10 +88,10 @@ export class FoodListComponent implements OnInit {
           createdAt: food.createdAt || '',
           available: food.available !== undefined ? food.available : true,
           spiceLevels: food.spiceLevels || []
-          
-        }));
+          };
+        });
         
-        
+        console.log('✅ Mapped foods categories:', foodItems.map(f => f.category));
       }
 
       let drinkItems: MenuItem[] = [];
