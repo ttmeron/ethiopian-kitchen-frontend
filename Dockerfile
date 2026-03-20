@@ -20,4 +20,4 @@ COPY --from=build /app/dist/ethiopian-kitchen-frontend/browser /usr/share/nginx/
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
-CMD ["/bin/sh", "-c", "envsubst '${BACKEND_URL}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "echo '=== DEBUG: BACKEND_URL =' $BACKEND_URL && envsubst '${BACKEND_URL}' < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf.tmp && cat /etc/nginx/nginx.conf.tmp && mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
