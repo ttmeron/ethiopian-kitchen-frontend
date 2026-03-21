@@ -12,8 +12,8 @@ import { AuthService } from './auth.service';
 @Injectable({ providedIn: 'root' })
 
 export class OrderService {
-  private readonly apiUrl = environment.orderApi
-  private readonly paymentiUrl = environment.apiUrl
+  private readonly apiUrl = `${environment.orderApi}`
+  private readonly paymentiUrl = `${environment.apiUrl}`
 
   constructor(private http: HttpClient, 
     private cartService: CartService,

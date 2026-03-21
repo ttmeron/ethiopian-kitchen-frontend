@@ -16,7 +16,7 @@ import { JwtHelperService } from './jwt-helper.service';
 
 export class AuthService {
 
-  private baseUrl = environment.authApi; 
+  private baseUrl = `${environment.authApi}`; 
 
   private authState: BehaviorSubject<boolean>; 
   private currentUserSubject: BehaviorSubject<AuthUser>;
