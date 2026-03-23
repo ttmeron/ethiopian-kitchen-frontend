@@ -59,12 +59,9 @@ export class AdminFoodManagementComponent implements OnInit{
   ingredients: Ingredient[] = [];
   selectedTab = 0;
 
-
   private baseUrl = environment.apiUrl;
   defaultImage = 'assets/default-food.png';
   foodForm!: FormGroup;
-
-
 
   isEditingFood = false;
   selectedFood: FoodResponse | null = null;
@@ -365,12 +362,12 @@ export class AdminFoodManagementComponent implements OnInit{
 
     console.log('🚀 Starting food update...');
 
-      const ingredients = this.selectedIngredients.map(ing => ({
-          id: ing.id,
-          extraCost: ing.extraCost || 0
-        }));
+   const ingredients = this.selectedIngredients.map(ing => ({
+      id: ing.id,
+      extraCost: ing.extraCost || 0
+    }));
 
-        console.log('🧪 Selected ingredients:', ingredients);
+    console.log('🧪 Selected ingredients:', ingredients);
   
     const foodData: FoodRequest = {
       name: this.foodForm.value.name,
@@ -403,49 +400,33 @@ export class AdminFoodManagementComponent implements OnInit{
     if (this.isEditingFood && this.selectedFood?.id) {
     console.log('✏️ Updating existing food ID:', this.selectedFood.id);
     
-      this.adminService.updateFood(this.selectedFood.id, foodData, this.selectedFile || undefined)
-      .subscribe({
-        next: (response) => {
-          console.log('✅ Food updated successfully:', response);
-          this.loadFoods();
-          this.resetFoodForm();
-          alert('Food updated successfully!');
-        },
-        error: (error) => {
-          console.error('❌ Update failed:', error);
-          
-          // Detailed error info
-          if (error.status) {
-            console.log('Status:', error.status);
-          }
-          if (error.error) {
-            console.log('Error response:', error.error);
-          }
-          if (error.message) {
-            console.log('Message:', error.message);
-          }
-          
-          if (error.status === 403) {
-            alert('Access denied. You need admin privileges.');
-          } else if (error.status === 400) {
-            alert('Invalid data format: ' + (error.error?.message || 'Check your input'));
-          } else if (error.status === 500) {
-            alert('Server error: ' + (error.error?.message || 'Internal server error'));
-          } else {
-            alert('Error: ' + error.message);
-          }
-        }
-      });
-    } else {
-      this.adminService.createFood(foodData, this.selectedFile ?? undefined).subscribe({
-        next: (response) => {
-          console.log('Food created successfully:', response);
-          this.loadFoods();
-          this.resetFoodForm();
-          alert('Food created successfully!');
-        },
-        error: (error) => handleError(error, 'creating')
-      });
+      this.adminService.updateFoodWithImage(
+      this.selectedFood.id, 
+      foodData, 
+      this.selectedFile || undefined
+    ).subscribe({
+      next: (response) => {
+        console.log('✅ Food updated successfully:', response);
+        this.loadFoods();
+        this.resetFoodForm();
+        alert('Food updated successfully!');
+      },
+      error: (error) => handleError(error, 'updating')
+    });
+  } else {
+    // ✅ Use createFoodWithImage
+    this.adminService.createFoodWithImage(
+      foodData, 
+      this.selectedFile || undefined
+    ).subscribe({
+      next: (response) => {
+        console.log('✅ Food created successfully:', response);
+        this.loadFoods();
+        this.resetFoodForm();
+        alert('Food created successfully!');
+      },
+      error: (error) => handleError(error, 'creating')
+    });
     }
     
   }

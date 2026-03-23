@@ -22,7 +22,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PaymentComponent } from './components/payment/payment.component';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AdminFoodManagementComponent } from './components/admin-food-management/admin-food-management.component';
-
+import { CloudinaryModule } from '@cloudinary/ng';
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,6 +41,7 @@ import { AdminFoodManagementComponent } from './components/admin-food-management
     ReactiveFormsModule,
     MatDialogModule,
     MatCheckboxModule,
+    CloudinaryModule,
     AdminFoodManagementComponent  ],
   imports: [
     BrowserModule,

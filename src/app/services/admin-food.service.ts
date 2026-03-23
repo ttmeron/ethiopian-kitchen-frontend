@@ -5,8 +5,9 @@ import { Observable,throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { FoodResponse, Ingredient } from '../shared/models/food-response.model';
 import { AuthService } from './auth.service';
+import { CloudinaryService } from './cloudinary.service';
 
-import { catchError } from 'rxjs/operators';
+import { catchError,switchMap } from 'rxjs/operators';
 
 export interface FoodRequest {
     name: string;
@@ -26,7 +27,8 @@ export class AdminFoodService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private cloudinary: CloudinaryService
     
   ) {}
 
@@ -41,6 +43,28 @@ export class AdminFoodService {
     
     return throwError(() => new Error('An error occurred. Please try again.'));
   }
+
+   createFoodWithImage(foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
+    if (!this.authService.isAdmin()) {
+      return throwError(() => new Error('Admin access required'));
+    }
+
+    // If there's an image, upload to Cloudinary first
+    if (imageFile) {
+      return this.cloudinary.uploadImage(imageFile).pipe(
+        switchMap((cloudinaryResult: any) => {
+          // Add the Cloudinary URL to the food data
+          foodData.imagePath = cloudinaryResult.secure_url;
+          return this.createFood(foodData);
+        }),
+        catchError(this.handleError)
+      );
+    }
+    
+    // No image, just create the food
+    return this.createFood(foodData);
+  }
+  
 
   createFood(foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
     
@@ -59,6 +83,29 @@ export class AdminFoodService {
     return this.http.post<FoodResponse>(`${this.apiUrl}/foods/admin/`, formData)
     .pipe(catchError(this.handleError));
   }
+
+
+  updateFoodWithImage(id: number, foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
+    if (!this.authService.isAdmin()) {
+      return throwError(() => new Error('Admin access required'));
+    }
+
+    if (imageFile) {
+      // Upload new image to Cloudinary
+      return this.cloudinary.uploadImage(imageFile).pipe(
+        switchMap((cloudinaryResult: any) => {
+          // Update with new Cloudinary URL
+          foodData.imagePath = cloudinaryResult.secure_url;
+          return this.updateFood(id, foodData);
+        }),
+        catchError(this.handleError)
+      );
+    }
+    
+    // No new image, just update the food
+    return this.updateFood(id, foodData);
+  }
+
 
   updateFood(id: number, foodData: FoodRequest, imageFile?: File): Observable<FoodResponse> {
   const formData = new FormData();
