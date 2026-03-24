@@ -10,7 +10,8 @@ private readonly EXCLUDED_ENDPOINTS = [
     '/auth/login',
     '/auth/register',
     '/auth/forgot-password',
-    '/user/guest'
+    '/user/guest',
+    'cloudinary.com'
   ];
 
   constructor(private authService: AuthService) {}
