@@ -162,7 +162,7 @@ initForm() {
   }
 
   if (this.isEditing && this.selectedDrink) {
-    this.drinkService.updateDrink(this.selectedDrink.id, formData)
+    this.drinkService.updateDrinkWithImage(this.selectedDrink.id, formData, this.selectedFile || undefined)
       .subscribe({
         next: () => {
           console.log('Drink updated successfully');
@@ -175,7 +175,7 @@ initForm() {
         }
       });
   } else {
-    this.drinkService.createDrink(formData)
+    this.drinkService.createDrinkWithImage(formData, this.selectedFile || undefined)
       .subscribe({
         next: () => {
           console.log('Drink created successfully');
@@ -206,12 +206,14 @@ initForm() {
   }
 
   getImageUrl(drink: SoftDrink): string {
-    if (!drink.imagePath) return 'assets/default-drink.png';
-    return drink.imagePath.startsWith('http')
-      ? drink.imagePath
-      : `${this.baseUrl}/images/${drink.imagePath}`;
+    if (!drink.imagePath) {
+      return 'assets/default-drink.png';}
+      
+    if (drink.imagePath.startsWith('http')) {
+      return drink.imagePath;
   }
-
+    return `${this.baseUrl}/images/${drink.imagePath}`;
+}
 
 
 }

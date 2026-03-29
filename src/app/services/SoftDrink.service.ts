@@ -2,15 +2,16 @@ import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, throwError} from "rxjs";
 import { of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, tap, switchMap } from 'rxjs/operators';
 import { environment } from "../../environments/environment";
+import { CloudinaryService } from "./cloudinary.service";
 
 export interface SoftDrink {
   id: number;
   name: string;
   description: string;
   price: number;
-  imagePath: string;
+  imagePath?: string;
   Size: string;
   iceOption: string;
 }
@@ -31,7 +32,42 @@ export class SoftDrinkService {
   private apiUrl = `${this.baseUrl}/soft-drinks`;
   private adminUrl =  `${this.baseUrl}/soft-drinks/admin`;
   
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cloudinary: CloudinaryService) {}
+
+ createDrinkWithImage(drinkData: any, imageFile?: File): Observable<SoftDrink> {
+    if (imageFile) {
+      return this.cloudinary.uploadImage(imageFile).pipe(
+        switchMap((cloudinaryResult: any) => {
+          drinkData.imagePath = cloudinaryResult.secure_url;
+          return this.createDrink(drinkData);
+        }),
+        catchError(error => {
+          console.error('Image upload failed:', error);
+          return throwError(() => error);
+        })
+      );
+    }
+    return this.createDrink(drinkData);
+  }
+
+  // Update drink with optional new image
+  updateDrinkWithImage(id: number, drinkData: any, imageFile?: File): Observable<SoftDrink> {
+    if (imageFile) {
+      return this.cloudinary.uploadImage(imageFile).pipe(
+        switchMap((cloudinaryResult: any) => {
+          drinkData.imagePath = cloudinaryResult.secure_url;
+          return this.updateDrink(id, drinkData);
+        }),
+        catchError(error => {
+          console.error('Image upload failed:', error);
+          return throwError(() => error);
+        })
+      );
+    }
+    return this.updateDrink(id, drinkData);
+  }    
   
 getAllSoftDrinks(): Observable<SoftDrink[]> {
   console.log('🔍 [SoftDrinkService] Making request to:', this.apiUrl);
@@ -157,6 +193,7 @@ createDrink(formData: FormData): Observable<any> {
 updateDrink(id: number, formData: FormData): Observable<any> {
   return this.http.put(`${this.adminUrl}/${id}`, formData);
 }
+
 
 deleteDrink(id: number) {
   return this.http.delete(`${this.adminUrl}/${id}`);
