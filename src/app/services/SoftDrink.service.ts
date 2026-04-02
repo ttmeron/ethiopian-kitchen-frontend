@@ -36,38 +36,21 @@ export class SoftDrinkService {
     private http: HttpClient,
     private cloudinary: CloudinaryService) {}
 
- createDrinkWithImage(drinkData: any, imageFile?: File): Observable<SoftDrink> {
-    if (imageFile) {
-      return this.cloudinary.uploadImage(imageFile).pipe(
-        switchMap((cloudinaryResult: any) => {
-          drinkData.imagePath = cloudinaryResult.secure_url;
-          return this.createDrink(drinkData);
-        }),
-        catchError(error => {
-          console.error('Image upload failed:', error);
-          return throwError(() => error);
-        })
-      );
-    }
-    return this.createDrink(drinkData);
+createDrinkWithImage(drinkData: any, imageFile?: File): Observable<SoftDrink> {
+  if (imageFile) {
+    return this.cloudinary.uploadImage(imageFile).pipe(
+      switchMap((cloudinaryResult: any) => {
+        drinkData.imagePath = cloudinaryResult.secure_url;
+        return this.createDrink(drinkData);
+      }),
+      catchError(error => {
+        console.error('Image upload failed:', error);
+        return throwError(() => error);
+      })
+    );
   }
-
-  // Update drink with optional new image
-  updateDrinkWithImage(id: number, drinkData: any, imageFile?: File): Observable<SoftDrink> {
-    if (imageFile) {
-      return this.cloudinary.uploadImage(imageFile).pipe(
-        switchMap((cloudinaryResult: any) => {
-          drinkData.imagePath = cloudinaryResult.secure_url;
-          return this.updateDrink(id, drinkData);
-        }),
-        catchError(error => {
-          console.error('Image upload failed:', error);
-          return throwError(() => error);
-        })
-      );
-    }
-    return this.updateDrink(id, drinkData);
-  }    
+  return this.createDrink(drinkData);
+}
   
 getAllSoftDrinks(): Observable<SoftDrink[]> {
   console.log('🔍 [SoftDrinkService] Making request to:', this.apiUrl);
@@ -184,14 +167,28 @@ getAllSoftDrinks(): Observable<SoftDrink[]> {
     }
     return throwError(() => new Error(errorMessage));
   }
-
-
-createDrink(formData: FormData): Observable<any> {
-  return this.http.post(this.adminUrl, formData);
+updateDrinkWithImage(id: number, drinkData: any, imageFile?: File): Observable<SoftDrink> {
+  if (imageFile) {
+    return this.cloudinary.uploadImage(imageFile).pipe(
+      switchMap((cloudinaryResult: any) => {
+        drinkData.imagePath = cloudinaryResult.secure_url;
+        return this.updateDrink(id, drinkData);
+      }),
+      catchError(error => {
+        console.error('Image upload failed:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  return this.updateDrink(id, drinkData);
 }
 
-updateDrink(id: number, formData: FormData): Observable<any> {
-  return this.http.put(`${this.adminUrl}/${id}`, formData);
+createDrink(drinkData: any): Observable<SoftDrink> {
+  return this.http.post<SoftDrink>(`${this.adminUrl}`, drinkData);
+}
+
+updateDrink(id: number, drinkData: any): Observable<SoftDrink> {
+  return this.http.put<SoftDrink>(`${this.adminUrl}/${id}`, drinkData);
 }
 
 

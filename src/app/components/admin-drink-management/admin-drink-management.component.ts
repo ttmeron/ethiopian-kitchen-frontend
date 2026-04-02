@@ -143,8 +143,6 @@ initForm() {
   submitDrink() {
   if (this.drinkForm.invalid) return;
 
-  const formData = new FormData();
-  
   const drinkData = {
     name: this.drinkForm.get('name')?.value,
     description: this.drinkForm.get('description')?.value,
@@ -153,39 +151,35 @@ initForm() {
     iceOption: this.drinkForm.get('iceOption')?.value
   };
 
-  formData.append('drink', new Blob([JSON.stringify(drinkData)], {
-    type: 'application/json'
-  }));
-
-  if (this.selectedFile) {
-    formData.append('image', this.selectedFile); 
-  }
-
   if (this.isEditing && this.selectedDrink) {
-    this.drinkService.updateDrinkWithImage(this.selectedDrink.id, formData, this.selectedFile || undefined)
-      .subscribe({
-        next: () => {
-          console.log('Drink updated successfully');
-          this.loadDrinks();
-          this.addDrink();
-        },
-        error: (error) => {
-          console.error('Error updating drink:', error);
-          console.log('Full error object:', JSON.stringify(error, null, 2));
-        }
-      });
+    this.drinkService.updateDrinkWithImage(
+      this.selectedDrink.id, 
+      drinkData,  // ✅ JSON object
+      this.selectedFile || undefined
+    ).subscribe({
+      next: () => {
+        console.log('Drink updated successfully');
+        this.loadDrinks();
+        this.addDrink();
+      },
+      error: (error) => {
+        console.error('Error updating drink:', error);
+      }
+    });
   } else {
-    this.drinkService.createDrinkWithImage(formData, this.selectedFile || undefined)
-      .subscribe({
-        next: () => {
-          console.log('Drink created successfully');
-          this.loadDrinks();
-          this.addDrink();
-        },
-        error: (error) => {
-          console.error('Error creating drink:', error);
-        }
-      });
+    this.drinkService.createDrinkWithImage(
+      drinkData,  // ✅ JSON object
+      this.selectedFile || undefined
+    ).subscribe({
+      next: () => {
+        console.log('Drink created successfully');
+        this.loadDrinks();
+        this.addDrink();
+      },
+      error: (error) => {
+        console.error('Error creating drink:', error);
+      }
+    });
   }
 }
   deleteDrink(drink: SoftDrink) {
