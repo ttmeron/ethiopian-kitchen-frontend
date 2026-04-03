@@ -1,19 +1,22 @@
-
 .food-modal {
   width: 100%;
   max-width: 500px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  background: white;
 
   .food-header {
-    display: flex;
     position: relative;
-    height: 160px !important;
+    height: 200px;
     overflow: hidden;
+    background-color: #f5f5f5;
+    flex-shrink: 0;
 
     .header-image {
-      padding-top: 1px;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -36,8 +39,14 @@
   }
 
   .food-content {
+    flex: 1;
+    overflow-y: auto;
     padding: 20px;
     background: white;
+
+    @media (max-width: 480px) {
+      padding: 15px;
+    }
 
     .food-description {
       color: #555;
@@ -59,12 +68,12 @@
 
       .price-value {
         font-weight: bold;
-        color: #078735; 
+        color: #078735;
       }
     }
 
     .section-title {
-      color: #d22b2b; 
+      color: #d22b2b;
       font-size: 1.2rem;
       margin-bottom: 15px;
       display: flex;
@@ -93,22 +102,6 @@
 
       .mat-checkbox {
         width: 100%;
-      }
-    }
-    .button-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-    
-    .loading-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      mat-spinner {
-        margin-right: 8px;
       }
     }
 
@@ -147,14 +140,16 @@
 
     .instructions-section {
       margin: 20px 0;
-      margin-bottom: 1.5rem;
       width: 100%;
 
-      .mat-form-field {
-        width: 100% !important;
+      .full-width {
+        width: 100%;
 
         textarea {
           min-height: 80px;
+          width: 100%;
+          padding: 12px;
+          box-sizing: border-box;
         }
       }
     }
@@ -162,7 +157,7 @@
     .total-section {
       display: flex;
       justify-content: space-between;
-      margin-top: 5px;
+      margin-top: 20px;
       padding-top: 15px;
       border-top: 1px solid #eee;
 
@@ -180,123 +175,55 @@
   }
 
   .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 15px 20px;
-    background: #f9f9f9;
+    padding: 16px 20px;
+    background: white;
     border-top: 1px solid #eee;
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      padding: 12px 16px;
+    }
 
     button {
+      width: 100%;
       min-width: 120px;
-      padding: 8px 20px;
+      padding: 12px 20px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-
-      &[mat-raised-button] {
-        background: #078735;
-        color: white;
-      }
-    }
-  }
-
-  .food-header {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-    background-color: #f5f5f5;
-  
-    .header-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  
-    .food-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      background: #078735;
       color: white;
-      font-size: 1.8rem;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+
+      &:hover {
+        background: #066128;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 480px) {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
   }
-
-  .instructions-section {
-    width: 100%;
-    margin: 20px 0;
-    
-  
-    .full-width {
-      width: 100%;
-      background: #f9f9f9;
-      border-radius: 6px;
-      transition: all 0.2s;
-      
-  
-      // Force the form field to take full width
-      .mat-form-field-infix {
-        width: 100%;
-        padding: 0;
-        border-top: 0;
-      }
-  
-      // Textarea specific styles
-      textarea.mat-input-element {
-        width: 100% !important;
-        min-height: 200px;
-        resize: vertical;
-        padding: 12px;
-        box-sizing: border-box;
-        line-height: 1.5;
-        
-      }
-  
-     
-      .mat-form-field-outline {
-        top: 0;
-        color: #078735;
-        transition: color 0.3s ease;
-        
-      }
-       
-    &.mat-focused .mat-form-field-outline {
-      color: #d22b2b; 
-    }
-
-    
-    &.mat-form-field-invalid .mat-form-field-outline {
-      color: #f44336; 
-    }
-  
-    &.mat-focused {
-      .mat-form-field-outline {
-        color: #d22b2b;
-      }
-    }
-
-   
-    &.mat-form-field-invalid {
-      .mat-form-field-outline {
-        color: #f44336;
-      }
-    }
-      .mat-form-field-wrapper {
-        padding-bottom: 0;
-      }
-  
-      .mat-form-field-flex {
-        align-items: flex-start;
-        
-      }
-    }
-  }
-  
 }
