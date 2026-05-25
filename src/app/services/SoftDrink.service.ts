@@ -184,11 +184,17 @@ updateDrinkWithImage(id: number, drinkData: any, imageFile?: File): Observable<S
 }
 
 createDrink(drinkData: any): Observable<SoftDrink> {
-  return this.http.post<SoftDrink>(`${this.adminUrl}`, drinkData);
+  const formData = new FormData();
+  formData.append('drink', JSON.stringify(drinkData));
+  return this.http.post<SoftDrink>(`${this.adminUrl}`, formData);
 }
 
 updateDrink(id: number, drinkData: any): Observable<SoftDrink> {
-  return this.http.put<SoftDrink>(`${this.adminUrl}/${id}`, drinkData);
+
+  const formData = new FormData();
+  formData.append('drink', JSON.stringify(drinkData));
+  
+  return this.http.put<SoftDrink>(`${this.adminUrl}/${id}`, formData);
 }
 
 
