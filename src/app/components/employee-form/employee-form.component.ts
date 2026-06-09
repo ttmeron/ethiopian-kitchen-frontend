@@ -19,6 +19,11 @@ export class EmployeeFormComponent implements OnInit {
   isLoading = false;
   isSubmitting = false;
 
+  generateTempPassword = true;
+  tempPassword = '';
+  showTempPassword = false;
+  sendEmailNotification = true;
+
   positions = ['CHEF', 'SOUS_CHEF', 'LINE_COOK', 'DISHWASHER', 'WAITER', 'WAITRESS', 'ADMIN','SERVER', 'BARTENDER', 'HOST', 'HOSTESS', 'MANAGER', 'ASSISTANT_MANAGER', 'CASHIER'];
   shifts = ['MORNING', 'EVENING', 'NIGHT'];
   departments = ['KITCHEN', 'SERVICE', 'MANAGEMENT', 'FRONT_DESK', 'GENERAL'];
@@ -38,6 +43,8 @@ export class EmployeeFormComponent implements OnInit {
 
     if (this.isEditMode) {
       this.loadEmployee();
+    }else {
+      this.tempPassword = this.generateRandomPassword();
     }
   }
 
@@ -71,6 +78,21 @@ export class EmployeeFormComponent implements OnInit {
   get address() { return this.employeeForm.get('address'); }
   get dateOfBirth() { return this.employeeForm.get('dateOfBirth'); }
 
+
+ generateRandomPassword(): string {
+    const length = 10;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  }
+
+  regeneratePassword(): void {
+    this.tempPassword = this.generateRandomPassword();
+    this.showTempPassword = true;
+  }
 
   loadEmployee(): void {
     if (!this.employeeId) return;
@@ -111,11 +133,18 @@ export class EmployeeFormComponent implements OnInit {
   
     if (this.employeeForm.valid) {
       this.isSubmitting = true;
-      const employeeData: EmployeeRequest = this.employeeForm.value;
 
-    console.log('📋 Form Data:', this.employeeForm.value);
-    console.log('📅 Date of Birth value:', this.employeeForm.get('dateOfBirth')?.value);
-    console.log('✅ Form valid:', this.employeeForm.valid);
+      const employeeData: any = {
+        ...this.employeeForm.value,
+        active: true,
+        employeeCode: this.generateEmployeeCode(),
+        role: this.employeeForm.value.position, // Use position as role for auth
+      };
+
+       if (!this.isEditMode && this.generateTempPassword) {
+        employeeData.password = this.tempPassword;
+        employeeData.isTemporaryPassword = true;
+      }
 
       if (this.isEditMode && this.employeeId) {
         this.employeeService.updateEmployee(this.employeeId, employeeData).subscribe({
@@ -132,7 +161,19 @@ export class EmployeeFormComponent implements OnInit {
         });
       } else {
         this.employeeService.createEmployee(employeeData).subscribe({
-          next: () => {
+          next: (newEmployee) => {
+            // Send email with temporary password
+            if (this.sendEmailNotification && this.tempPassword) {
+              this.employeeService.sendCredentialsEmail(newEmployee.email, this.tempPassword).subscribe({
+                next: () => console.log('Email sent to:', newEmployee.email),
+                error: (err) => console.error('Failed to send email:', err)
+              });
+            }
+            
+            if (!this.sendEmailNotification) {
+              alert(`Employee created! Temporary password: ${this.tempPassword}\nPlease save this password.`);
+            }
+            
             this.router.navigate(['/admin/employees']);
           },
           error: (error) => {
@@ -154,6 +195,9 @@ export class EmployeeFormComponent implements OnInit {
     });
       this.markFormGroupTouched();
     }
+  }
+    generateEmployeeCode(): string {
+    return 'EMP' + Date.now().toString().slice(-6);
   }
 
   markFormGroupTouched(): void {

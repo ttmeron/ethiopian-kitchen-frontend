@@ -202,6 +202,92 @@
                               rows="3" placeholder="Enter full address"></textarea>
                   </div>
                 </div>
+                                @if (!isEditMode) {
+                  <div class="row mt-3">
+                    <div class="col-12">
+                      <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                          <strong>🔐 Employee Login Credentials</strong>
+                        </div>
+                        <div class="card-body">
+                          <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="generateTempPassword" 
+                                  [(ngModel)]="generateTempPassword" [ngModelOptions]="{standalone: true}">
+                            <label class="form-check-label" for="generateTempPassword">
+                              Generate temporary password automatically
+                            </label>
+                          </div>
+                          
+                          <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="sendEmail" 
+                                  [(ngModel)]="sendEmailNotification" [ngModelOptions]="{standalone: true}">
+                            <label class="form-check-label" for="sendEmail">
+                              Send credentials via email
+                            </label>
+                          </div>
+                          
+                          @if (generateTempPassword) {
+                            <div class="alert alert-warning">
+                              <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <strong>Temporary Password:</strong>
+                                  @if (showTempPassword) {
+                                    <code class="ms-2 p-2 bg-light rounded">{{ tempPassword }}</code>
+                                  } @else {
+                                    <code class="ms-2 p-2 bg-light rounded">••••••••••</code>
+                                  }
+                                </div>
+                                <div>
+                                  <button type="button" class="btn btn-sm btn-outline-secondary me-1" 
+                                          (click)="showTempPassword = !showTempPassword">
+                                    {{ showTempPassword ? 'Hide' : 'Show' }}
+                                  </button>
+                                  <button type="button" class="btn btn-sm btn-outline-primary" 
+                                          (click)="regeneratePassword()">
+                                    Regenerate
+                                  </button>
+                                </div>
+                              </div>
+                              <small class="d-block mt-2 text-muted">
+                                ⚠️ Employee must change this password on first login
+                              </small>
+                            </div>
+                          }
+                          
+                          <div class="alert alert-info mt-2">
+                            <small>
+                              <strong>Login Info:</strong> Employee will use their <strong>email address</strong> 
+                              as username and the password above to login.
+                              <br>
+                              <strong>Access Level:</strong> Based on position "{{ position?.value || 'Not selected' }}"
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <!-- Password Reset for Existing Employees -->
+                @if (isEditMode) {
+                  <div class="row mt-3">
+                    <div class="col-12">
+                      <div class="card border-warning">
+                        <div class="card-header bg-warning">
+                          <strong>🔑 Password Management</strong>
+                        </div>
+                        <div class="card-body">
+                          <button type="button" class="btn btn-warning" (click)="resetEmployeePassword()">
+                            Reset Password & Send Temporary Login
+                          </button>
+                          <small class="d-block mt-2 text-muted">
+                            This will generate a new temporary password and email it to the employee
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
 
                 <!-- Form Actions -->
                 <div class="form-actions mt-4 pt-3 border-top">

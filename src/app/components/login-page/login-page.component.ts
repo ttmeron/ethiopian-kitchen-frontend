@@ -55,20 +55,35 @@ async onSubmit(): Promise<void> {
     
     try {
       console.log('🔐 1. Starting login process...');
-      
-      const success = await this.authFlow.login({
+
+       let success = false;
+       let isEmployeeLogin = false;
+    
+      try{
+       success = await this.authFlow.login({
         email: this.email.toLowerCase().trim(),
         password: this.password
       });
-
+    } catch(customerError){
+      
+      console.log('Customer login failed, trying employee login...');
+      
+    try {
+        const employeeResponse = await this.authService.employeeLogin(
+          this.email.toLowerCase().trim(),
+          this.password
+        ).toPromise();
+        
+        success = true;
+        isEmployeeLogin = true;
+      } catch (employeeError) {
+        throw new Error('Invalid email or password');
+      }
+    }
       console.log('🔐 2. Login successful:', success);
       
       if (success) {
-        console.log('🔐 3. Checking admin status...');
-        console.log('🔐 4. isAdmin():', this.authService.isAdmin());
-        console.log('🔐 5. getUserRole():', this.authService.getUserRole());
-        console.log('🔐 6. Current user:', this.authService.getCurrentUser());
-        console.log('🔐 7. sessionStorage role:', sessionStorage.getItem('userRole'));
+        
 
         if (this.authService.isAdmin()) {
           console.log('🎯 8. ADMIN DETECTED - Redirecting to /admin/foods');

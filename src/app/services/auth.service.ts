@@ -207,6 +207,55 @@ getCurrentUser(): AuthUser {
     localStorage.removeItem('token');
   }
 
+   employeeLogin(email: string, password: string): Observable<AuthResponse> {
+    console.log('Employee login attempt:', { email });
+    
+    return this.http.post<AuthResponse>(`${this.baseUrl}/employee/login`, { email, password }).pipe(
+      tap((response) => {
+        if (response.token) {
+          // Store auth data
+          sessionStorage.setItem('token', response.token);
+          sessionStorage.setItem('authToken', response.token);
+          sessionStorage.setItem('email', response.email);
+          sessionStorage.setItem('userName', response.userName);
+          sessionStorage.setItem('isEmployee', 'true');
+          
+          // Store position/role
+          if (response.role) {
+            sessionStorage.setItem('employeePosition', response.role);
+            sessionStorage.setItem('userRole', response.role);
+          }
+          
+          this.authState.next(true);
+          this.currentUserSubject.next(this.getCurrentUser());
+        }
+      }),
+      catchError(this.handleLoginError)
+    );
+  }
+
+  // Check if current user is employee
+  isEmployee(): boolean {
+    return sessionStorage.getItem('isEmployee') === 'true' || 
+           !!sessionStorage.getItem('employeePosition');
+  }
+
+  // Get employee position
+  getEmployeePosition(): string | null {
+    return sessionStorage.getItem('employeePosition');
+  }
+
+  // Check if user can view orders (employees + admin)
+  canViewOrders(): boolean {
+    return this.isAuthenticated() && (this.isAdmin() || this.isEmployee());
+  }
+
+  // Employee logout
+  employeeLogout(): void {
+    sessionStorage.removeItem('isEmployee');
+    sessionStorage.removeItem('employeePosition');
+    this.logout();
+  }
 
   register(user: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/register`, user);
