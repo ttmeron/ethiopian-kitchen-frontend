@@ -21,6 +21,13 @@ export class EmployeeService {
   getAllEmployees(): Observable<EmployeeResponse[]> {
     return this.http.get<EmployeeResponse[]>(this.apiUrl);
   }
+  sendCredentialsEmail(email: string, tempPassword: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/send-credentials`, { email, tempPassword });
+}
+
+resetEmployeePassword(id: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/${id}/reset-password`, {});
+}
 
   getEmployeeById(id: number): Observable<EmployeeResponse> {
     return this.http.get<EmployeeResponse>(`${this.apiUrl}/${id}`);
