@@ -15,6 +15,10 @@ export interface Employee {
   createdAt?: string;
   dateOfBirth: string;
   shift: string;
+  role?: string;
+  password?: string;
+  isTemporaryPassword?: boolean;
+  lastLogin?: string;
 }
 
 export interface EmployeeRequest {
@@ -30,6 +34,9 @@ export interface EmployeeRequest {
   emergencyContact: string;
   dateOfBirth: string;
   shift: string;
+  role?: string;
+  password?: string;
+  isTemporaryPassword?: boolean;
 }
 
 export interface EmployeeResponse {

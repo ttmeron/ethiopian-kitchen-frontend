@@ -212,20 +212,20 @@
                         <div class="card-body">
                           <div class="form-check mb-2">
                             <input type="checkbox" class="form-check-input" id="generateTempPassword" 
-                                  [(ngModel)]="generateTempPassword" [ngModelOptions]="{standalone: true}">
+                                  [(ngModel)]="generateTempPassword">
                             <label class="form-check-label" for="generateTempPassword">
                               Generate temporary password automatically
                             </label>
                           </div>
                           
                           <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="sendEmail" 
-                                  [(ngModel)]="sendEmailNotification" [ngModelOptions]="{standalone: true}">
-                            <label class="form-check-label" for="sendEmail">
-                              Send credentials via email
-                            </label>
-                          </div>
-                          
+                              <input type="checkbox" class="form-check-input" id="sendEmail" 
+                                    [(ngModel)]="sendEmailNotification">
+                              <label class="form-check-label" for="sendEmail">
+                                Send credentials via email
+                              </label>
+                            </div>
+
                           @if (generateTempPassword) {
                             <div class="alert alert-warning">
                               <div class="d-flex justify-content-between align-items-center">

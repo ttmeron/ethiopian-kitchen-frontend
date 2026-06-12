@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EmployeeService } from '../../services/employee.service';
 import { EmployeeRequest } from '../../shared/models/employee.model';
@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-employee-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,FormsModule],
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.scss'
 })
@@ -89,6 +89,28 @@ export class EmployeeFormComponent implements OnInit {
     return password;
   }
 
+resetEmployeePassword(): void {
+  if (!this.employeeId) {
+    alert('No employee selected');
+    return;
+  }
+  
+  if (confirm('Are you sure you want to reset the password for this employee? A new temporary password will be generated and sent.')) {
+    this.isSubmitting = true;
+    this.employeeService.resetEmployeePassword(this.employeeId).subscribe({
+      next: (response: any) => {
+        this.isSubmitting = false;
+        alert('Password reset successful! A new temporary password has been sent to the employee\'s email.');
+        console.log('Password reset response:', response);
+      },
+      error: (error: any) => {
+        this.isSubmitting = false;
+        console.error('Error resetting password:', error);
+        alert('Failed to reset password. Please try again.');
+      }
+    });
+  }
+}
   regeneratePassword(): void {
     this.tempPassword = this.generateRandomPassword();
     this.showTempPassword = true;
