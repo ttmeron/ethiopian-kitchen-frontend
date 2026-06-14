@@ -13,11 +13,12 @@ import { EmployeeFormComponent } from './components/employee-form/employee-form.
 import { AdminDrinkManagementComponent } from './components/admin-drink-management/admin-drink-management.component';
 import { AdminIngredientManagementComponent } from './components/admin-ingredient-management/admin-ingredient-management.component';
 import { AboutContactComponent } from './components/about-contact/about-contact.component';
+import { EmployeeGuard } from './guards/employee.guard';
 export const routes: Routes = [
     { path: '', redirectTo: 'foods', pathMatch: 'full' },
     { path: 'foods', component: FoodListComponent },
     { path: 'cart', component: CartComponent },
-    { path: 'orders', component: OrderDisplayComponent,canActivate: [AdminGuard] },
+    { path: 'orders', component: OrderDisplayComponent, canActivate: [EmployeeGuard] },
     { path: 'my-orders', component: MyOrdersComponent },
     { path: 'login', component: LoginPageComponent },
     { path: 'admin/ingredients', 

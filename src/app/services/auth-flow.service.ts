@@ -109,11 +109,17 @@ getCartItems(): CartItem[] {
 
   navigateToOrders(): void {
   const role = this.authService.getUserRole();
+  const isEmployee = this.authService.isEmployee();
   console.log('🧭 Navigating based on role:', role);
 
   if (role === 'ADMIN') {
     this.router.navigate(['/admin/orders']); 
-  } else if (role === 'USER') {
+  }
+  else if (isEmployee || this.isEmployeeRole(role)) {
+    console.log('👔 Employee detected, redirecting to employee orders');
+    this.router.navigate(['/employee/orders']);
+  }
+  else if (role === 'USER') {
     this.router.navigate(['/my-orders']); 
   } else {
     const guestEmail = sessionStorage.getItem('guestEmail');
@@ -123,6 +129,11 @@ getCartItems(): CartItem[] {
       this.openAuthDialog(); 
     }
   }
+}
+
+private isEmployeeRole(role: string): boolean {
+  const employeeRoles = ['CHEF', 'SOUS_CHEF', 'MANAGER', 'WAITER', 'CASHIER', 'EMPLOYEE', 'LINE_COOK', 'BARTENDER', 'HOST'];
+  return employeeRoles.includes(role?.toUpperCase());
 }
 }
 
